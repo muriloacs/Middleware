@@ -21,7 +21,7 @@ Installation
 2. Now tell composer to download Middleware by running the command:
 
     ```bash
-    $ php composer.phar update
+    $ sudo php composer.phar update
     ```
 
 
@@ -60,10 +60,14 @@ Configuration
     ],
     ```
 
-2. Define your middleware classes:
+
+Usage
+-----
+
+1. Define your middleware classes:
 
     ```bash
-    Application/Middleware/
+    Application/src/Application/Middleware/
     ```
 
     ```php
@@ -94,15 +98,11 @@ Configuration
     }
     ```
 
-
-Usage
------
-
 #### Global scope
-Middlewares on global scope will be used everytime a request is made.
+Middlewares on global scope will be executed everytime a request is made.
 
 #### Local scope
-Middlewares on local scope will be used only if declared inside a controller. For instance:
+Middlewares on local scope will be executed only if declared inside a controller. For instance:
 
     ```php
     namespace Application\Controller;
