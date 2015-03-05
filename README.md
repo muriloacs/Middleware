@@ -13,7 +13,7 @@ Installation
 
     ```json
     "require": {
-        "muriloamaral/Middleware": "dev-master"
+        "muriloamaral/middleware": "dev-master"
     }
     ```
 
