@@ -3,8 +3,6 @@ namespace Middleware\Listener;
 
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\Code\Reflection\ClassReflection as Reflection;
 use Middleware\Service\MiddlewareService;
@@ -59,40 +57,26 @@ class MiddlewareListener implements ListenerAggregateInterface
 
         $middlewareService->setEvent($event);
 
-        $this->handleGlobal($middlewareService, $serviceManager);
+        $this->handleGlobal($middlewareService);
         $this->handleLocal($middlewareService);
     }
 
     /**
      * Handles global middlewares.
      * @param MiddlewareService $middlewareService
-     * @param ServiceLocatorInterface $serviceManager
      */
-    protected function handleGlobal(MiddlewareService $middlewareService, ServiceLocatorInterface $serviceManager)
+    protected function handleGlobal(MiddlewareService $middlewareService)
     {
         $config  = $middlewareService->getConfig();
-        $globals = isset($config[Middleware::CONFIG_GLOBAL]) && count($config[Middleware::CONFIG_GLOBAL]) ? $config[Middleware::CONFIG_GLOBAL] : null;
 
-        if (!$globals) {
+        if (!isset($config[Middleware::CONFIG_GLOBAL]) || !count($config[Middleware::CONFIG_GLOBAL])) {
             return;
         }
 
+        $globals = $config[Middleware::CONFIG_GLOBAL];
+
         foreach ($globals as $middlewareClass) {
-            try {
-                $reflection = new Reflection($middlewareClass);
-                $reflection->getMethod(Middleware::HANDLE_METHOD);
-
-                $middleware = new $middlewareClass();
-
-                if ($middleware instanceof ServiceLocatorAwareInterface) {
-                    $middleware->setServiceLocator($serviceManager);
-                }
-
-                $middleware->handle($middlewareService->getRequest(), $middlewareService->getNext(), $middlewareService->getRedirect());
-            }
-            catch (Exception $e) {
-                return;
-            }
+            $middlewareService->run($middlewareClass);
         }
     }
 

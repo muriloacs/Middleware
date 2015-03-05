@@ -40,7 +40,9 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     public function __construct(Request $request, array $config)
     {
         $this->request = $request;
-        $this->config  = isset($config[Middleware::CONFIG]) && count($config[Middleware::CONFIG]) ? $config[Middleware::CONFIG] : null;
+        $this->config  = isset($config[Middleware::CONFIG]) && count($config[Middleware::CONFIG]) ?
+                         $config[Middleware::CONFIG] :
+                         null;
     }
     
     /**
@@ -49,12 +51,21 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     */
     public function __invoke($name)
     {
-        if (!$name || !isset($this->config[Middleware::CONFIG_LOCAL]) || !isset($this->config[Middleware::CONFIG_LOCAL][$name])) {
+        if (!$name || !isset($this->config[Middleware::CONFIG_LOCAL][$name])) {
             return;
         }
 
+        $middlewareClass = $this->config[Middleware::CONFIG_LOCAL][$name];
+        $this->run($middlewareClass);
+    }
+
+    /**
+     * Instantiates middleware class and runs its handle() method.
+     * @param string $middlewareClass
+     */
+    public function run($middlewareClass)
+    {
         try {
-            $middlewareClass = $this->config[Middleware::CONFIG_LOCAL][$name];
             $reflection = new Reflection($middlewareClass);
             $reflection->getMethod(Middleware::HANDLE_METHOD);
 
@@ -75,7 +86,7 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     * Returns $next() function.
     * @return callable
     */
-    public function getNext()
+    private function getNext()
     {
        return function(Request $request) {
            $this->event->setRequest($request);
@@ -86,7 +97,7 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     * Returns $redirect() function.
     * @return callable
     */
-    public function getRedirect()
+    private function getRedirect()
     {
        return function($url = '/') {
            $response = $this->event->getResponse();
