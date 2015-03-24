@@ -18,6 +18,10 @@
 	"autoload": {
 		"classmap": [
 			"./Module.php"
-		]
+		],
+        "psr-4": {
+          "MiddlewareTest\\" : "tests\\MiddlewareTest",
+          "Middleware\\" : "src\\Middleware"
+        }
 	}
 }
