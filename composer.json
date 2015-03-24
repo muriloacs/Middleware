@@ -1,27 +1,27 @@
 {
-	"name": "muriloamaral/middleware",
-	"description": "Creates middleware layer on Zend Framework 2.",
-	"type": "library",
-	"keywords": ["zf2", "zendframework", "zendframework2", "module", "middleware"],
-	"homepage": "https://github.com/muriloacs/Middleware",
-	"authors": [
-		{
-			"name": "Murilo Amaral",
-			"email": "muriloacs@yahoo.com.br",
-			"homepage": "http://muriloamaral.com"
-		}
-	],
-	"require": {
-		"php": ">=5.3.3",
-		"zendframework/zendframework": "2.*"
-	},
-	"autoload": {
-		"classmap": [
-			"./Module.php"
-		],
+    "name": "muriloamaral/middleware",
+    "description": "Creates middleware layer on Zend Framework 2.",
+    "type": "library",
+    "keywords": ["zf2", "zendframework", "zendframework2", "module", "middleware"],
+    "homepage": "https://github.com/muriloacs/Middleware",
+    "authors": [
+        {
+            "name": "Murilo Amaral",
+            "email": "muriloacs@yahoo.com.br",
+            "homepage": "http://muriloamaral.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "2.*"
+    },
+    "autoload": {
+        "classmap": [
+            "./Module.php"
+        ],
         "psr-4": {
           "MiddlewareTest\\" : "tests\\MiddlewareTest",
           "Middleware\\" : "src\\Middleware"
         }
-	}
+    }
 }
