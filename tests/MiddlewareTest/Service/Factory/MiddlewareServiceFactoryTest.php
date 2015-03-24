@@ -25,7 +25,6 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $serviceManager = $this->createServiceManagerMock();
         $actual = $this->factory->createService($serviceManager);
-
         $this->assertInstanceOf(MiddlewareService::class, $actual);
     }
 
