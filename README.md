@@ -1,7 +1,8 @@
 Middleware
 ============
 
-Creates middleware layer on Zend Framework 2. Useful when it's necessary to make some work between route and controller phases.
+Creates middleware layer on Zend Framework 2. Useful when it's necessary to make some work
+between route and controller dispatch phases.
 
 
 Installation
