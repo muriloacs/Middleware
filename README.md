@@ -78,6 +78,8 @@ Usage
     {
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             var_dump($request->getHeader('user-agent'));
         }
     }
@@ -90,6 +92,8 @@ Usage
     {
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             if (true) {
                 return $redirect('http://www.zendframework.com');
             }
@@ -144,13 +148,9 @@ Advanced usage
 
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             $config = $this->serviceLocator->get('config');
-
-            if ($config) {
-                return $redirect('http://www.zendframework.com');
-            }
-
-            $next($request);
         }
 
         public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -178,7 +178,7 @@ Advanced usage
     {
         public function handle(Request $request, Closure $next, Closure $redirect)
         {
-
+            // My code here.
         }
     }
     ```
