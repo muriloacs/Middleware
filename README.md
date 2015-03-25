@@ -169,12 +169,13 @@ Advanced usage
     ```php
     namespace Application\Middleware;
 
+    use Closure;
     use Zend\Http\PhpEnvironment\Request;
     use Middleware\MiddlewareInterface;
 
     class First implements MiddlewareInterface
     {
-        public function handle(Request $request, callable $next, callable $redirect)
+        public function handle(Request $request, Closure $next, Closure $redirect)
         {
 
         }
