@@ -91,7 +91,7 @@ class MiddlewareListener implements ListenerAggregateInterface
         try {
             $reflection = new Reflection($controllerClass);
             $reflection->getProperty(Middleware::PROPERTY);
-            $controllerClass::$middleware = $middlewareService;
+            $controllerClass::${Middleware::PROPERTY} = $middlewareService;
         }
         catch (Exception $e) {
             return;
