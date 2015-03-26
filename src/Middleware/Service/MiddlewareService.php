@@ -34,22 +34,6 @@ class MiddlewareService
         $this->middlewareFactory = $middlewareFactory;
     }
 
-    /***
-     * @param \Closure $factory
-     */
-    public function setMiddlewareFactory(\Closure $middlewareClosureFactory)
-    {
-        $this->middlewareClosureFactory = $middlewareClosureFactory;
-    }
-
-    /**
-     * @return \Closure
-     */
-    public function getMiddlewareFactory()
-    {
-        return $this->middlewareClosureFactory;
-    }
-
     /**
      * Instantiates middleware class and runs its handle() method.
      * @param string $middlewareClass
@@ -83,6 +67,15 @@ class MiddlewareService
         $middleware = $factory($middlewareClass);
         return $middleware;
     }
+
+    /**
+     * @return \Closure
+     */
+    public function getMiddlewareFactory()
+    {
+        return $this->middlewareClosureFactory;
+    }
+
 
     /**
     * Returns $next() function.
@@ -124,6 +117,15 @@ class MiddlewareService
     {
         return $this->event;
     }
+
+    /***
+     * @param \Closure $factory
+     */
+    public function setMiddlewareFactory(\Closure $middlewareClosureFactory)
+    {
+        $this->middlewareClosureFactory = $middlewareClosureFactory;
+    }
+
     /**
      * @param Request $request
      */
