@@ -3,6 +3,7 @@ namespace Middleware\Listener;
 
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
+use Zend\I18n\Exception\ParseException;
 use Zend\Mvc\MvcEvent;
 use Zend\Code\Reflection\ClassReflection as Reflection;
 use Middleware\Service\MiddlewareService;
@@ -11,6 +12,7 @@ use Exception;
 
 class MiddlewareListener implements ListenerAggregateInterface
 {
+    protected $globalConfig = array();
     /**
      * @var array
      */
@@ -54,6 +56,9 @@ class MiddlewareListener implements ListenerAggregateInterface
     public function onDispatch(MvcEvent $event)
     {
         $serviceManager = $event->getApplication()->getServiceManager();
+
+        $this->initConfig($serviceManager);
+
         $this->service = $serviceManager->get('MiddlewareService');
 
         if (!$this->service->getConfig()) {
@@ -65,20 +70,17 @@ class MiddlewareListener implements ListenerAggregateInterface
         $this->handleLocal();
     }
 
+    private function initConfig($serviceManager) {
+        $config = $serviceManager->has(Middleware::CONFIG) ?  $serviceManager->get(Middleware::CONFIG) : array();
+        $this->globalConfig = isset($config[Middleware::CONFIG_GLOBAL]) ? $config[Middleware::CONFIG_GLOBAL] : array();
+    }
+
     /**
      * Handles global middlewares.
      */
     protected function handleGlobal()
     {
-        $config  = $this->service->getConfig();
-
-        if (!isset($config[Middleware::CONFIG_GLOBAL]) || !count($config[Middleware::CONFIG_GLOBAL])) {
-            return;
-        }
-
-        $globals = $config[Middleware::CONFIG_GLOBAL];
-
-        foreach ($globals as $middlewareClass) {
+        foreach ($this->globalConfig as $middlewareClass) {
             $this->service->run($middlewareClass);
         }
     }
@@ -91,11 +93,9 @@ class MiddlewareListener implements ListenerAggregateInterface
         $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
 
         try {
-            $reflection = new Reflection($controllerClass);
-            $reflection->getProperty(Middleware::PROPERTY);
             $controllerClass::${Middleware::PROPERTY} = $this->service;
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             return;
         }
     }

@@ -2,12 +2,7 @@
 
 namespace MiddlewareTest\Service;
 
-use Middleware\MiddlewareInterface;
 use Middleware\Service\MiddlewareService;
-use Middleware\Entity\Middleware;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,80 +11,90 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
      */
     private $service;
 
-    protected function setUp()
+    public function testInvokeShouldCallHandleMethodFromMiddleware()
     {
-        parent::setUp();
-        $this->service = new MiddlewareService(
-            $this->createRequestMock(),
-            []
+
+        $middleware      = $this->givenMiddlewareStub();
+        $factory         = $this->givenMiddlewareFactory($middleware);
+        $service         = $this->givenService($factory);
+        $middlewareClass = get_class($middleware);
+        $factory         = $this->givenMiddlewareFactory($middleware);
+
+        $service->setMiddlewareFactory($factory);
+
+        $middleware->expects($this->once())->method('handle');
+
+        $service($middlewareClass);
+    }
+
+    /**
+     * @return \Middleware\MiddlewareService
+     */
+    private function givenService(\Closure $middlewareFactory)
+    {
+        $service = new MiddlewareService(
+            $this->givenRequestStub(),
+            $middlewareFactory
         );
-        $this->service->setServiceLocator($this->createServiceLocatorMock());
-
+        return $service;
     }
 
     /**
-     * @return Request|\PHPUnit_Framework_MockObject_MockObject
+     * @return \Zend\Http\PhpEnvironment\Request|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function createRequestMock()
+    private function givenRequestStub()
     {
-        $request = $this->getMock(Request::class);
+        $request = $this->getStub('Zend\Http\PhpEnvironment\Request');
         return $request;
     }
 
+
     /**
-     * @return ServiceLocatorAwareInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @param $className
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function createServiceLocatorMock()
+    private function getStub($className)
     {
-        $request = $this->getMock(ServiceLocatorInterface::class);
-        return $request;
-    }
-
-    public function testRunShouldCallHandleMethodFromMiddleware()
-    {
-        $this->service->run(StubMiddleware::class);
-        $this->assertTrue(StubMiddleware::$callConstructor);
-        $this->assertTrue(StubMiddleware::$callSetServiceLocator);
-        $this->assertTrue(StubMiddleware::$callHandle);
-    }
-
-}
-
-class StubMiddleware implements MiddlewareInterface, ServiceLocatorAwareInterface
-{
-    public static $callConstructor = false;
-    public static $callHandle = false;
-    public static $callSetServiceLocator = false;
-
-    public function __construct()
-    {
-        self::$callConstructor = true;
+        return $this->getMockForAbstractClass($className, array(), '', false, false, true, get_class_methods($className));
     }
 
     /**
-     * Set service locator
-     *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @return \Middleware\MiddlewareInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    private function givenMiddlewareStub()
     {
-        self::$callSetServiceLocator = true;
+        $middleware = $this->getStub('Middleware\MiddlewareInterface');
+        return $middleware;
     }
 
     /**
-     * Get service locator
-     *
-     * @return ServiceLocatorInterface
+     * @return \Zend\ServiceManager\ServiceLocatorAwareInterface | \PHPUnit_Framework_MockObject_MockObject
      */
-    public function getServiceLocator()
+    private function givenServiceLocatorAwareStub()
     {
-        // TODO: Implement getServiceLocator() method.
+        $middleware = $this->getStub('Zend\ServiceManager\ServiceLocatorAwareInterface');
+        return $middleware;
+    }
+
+    /**
+     * @return \Zend\ServiceManager\ServiceLocatorInterface | \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenServiceLocatorStub()
+    {
+        $middleware = $this->getStub('Zend\ServiceManager\ServiceLocatorInterface');
+        return $middleware;
     }
 
 
-    public function handle(Request $request, callable $next, callable $redirect)
+    /**
+     * @param $middleware
+     * @return \Closure
+     */
+    private function givenMiddlewareFactory($middleware)
     {
-        self::$callHandle = true;
+        return function($middlewareClass) use($middleware) {
+            return $middleware;
+        };
     }
 
 }

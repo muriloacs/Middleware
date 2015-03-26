@@ -1,16 +1,13 @@
 <?php
 namespace Middleware\Service;
 
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Code\Reflection\ClassReflection as Reflection;
+use Middleware\MiddlewareInterface;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Exception;
-use Middleware\Entity\Middleware;
 
-class MiddlewareService implements ServiceLocatorAwareInterface
+class MiddlewareService
 {
     /**
      * @var Request
@@ -18,45 +15,39 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     private $request;
 
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * @var MvcEvent
      */
     private $event;
 
     /**
-     * @var ServiceLocatorInterface
+     * @var \Closure
      */
-    private $serviceLocator;
+    private $middlewareFactory;
 
     /**
-     * Dependencies injected.
      * @param Request $request
-     * @param array $config
+     * @param \Closure  $middlewareFactory
      */
-    public function __construct(Request $request, array $config)
+    public function __construct(Request $request, \Closure $middlewareFactory)
     {
         $this->request = $request;
-        $this->config  = isset($config[Middleware::CONFIG]) && count($config[Middleware::CONFIG]) ?
-                         $config[Middleware::CONFIG] :
-                         null;
+        $this->middlewareFactory = $middlewareFactory;
     }
-    
-    /**
-    * Called within controllers, therefore handles with local middlewares.
-    * @param string $name Name of the middleware which is being called.
-    */
-    public function __invoke($name)
-    {
-        if (!$name || !isset($this->config[Middleware::CONFIG_LOCAL][$name])) {
-            return;
-        }
 
-        $middlewareClass = $this->config[Middleware::CONFIG_LOCAL][$name];
-        $this->run($middlewareClass);
+    /***
+     * @param \Closure $factory
+     */
+    public function setMiddlewareFactory(\Closure $middlewareClosureFactory)
+    {
+        $this->middlewareClosureFactory = $middlewareClosureFactory;
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getMiddlewareFactory()
+    {
+        return $this->middlewareClosureFactory;
     }
 
     /**
@@ -66,20 +57,31 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     public function run($middlewareClass)
     {
         try {
-            $reflection = new Reflection($middlewareClass);
-            $reflection->getMethod(Middleware::HANDLE_METHOD);
-
-            $middleware = new $middlewareClass();
-
-            if ($middleware instanceof ServiceLocatorAwareInterface) {
-                $middleware->setServiceLocator($this->getServiceLocator());
-            }
-
+            $middleware = $this->createMiddleware($middlewareClass);
             $middleware->handle($this->getRequest(), $this->getNext(), $this->getRedirect());
-        }
-        catch (Exception $e) {
+        } catch(\Exception $e) {
             return;
         }
+    }
+
+    /**
+     * Called within controllers
+     * @param string $middlewareClass Name of the middleware which is being called.
+     */
+    public function __invoke($middlewareClass)
+    {
+        $this->run($middlewareClass);
+    }
+
+    /**
+     * @param string
+     * @return MiddlewareInterface
+     */
+    private function createMiddleware($middlewareClass)
+    {
+        $factory = $this->getMiddlewareFactory();
+        $middleware = $factory($middlewareClass);
+        return $middleware;
     }
 
     /**
@@ -116,29 +118,12 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     }
 
     /**
-     * @return array|null
-     */
-    public function getConfig() 
-    {
-        return $this->config;
-    }
-
-    /**
      * @return MvcEvent
      */
     public function getEvent() 
     {
         return $this->event;
     }
-
-    /**
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
-    }
-
     /**
      * @param Request $request
      */
@@ -148,27 +133,11 @@ class MiddlewareService implements ServiceLocatorAwareInterface
     }
 
     /**
-     * @param array $config
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-    }
-
-    /**
      * @param MvcEvent $event
      */
     public function setEvent(MvcEvent $event)
     {
         $this->event = $event;
-    }
-
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
-    {
-        $this->serviceLocator = $serviceLocator;
     }
 
 }
