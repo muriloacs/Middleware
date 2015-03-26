@@ -84,7 +84,7 @@ class MiddlewareService implements ServiceLocatorAwareInterface
 
     /**
     * Returns $next() function.
-    * @return callable
+    * @return Closure
     */
     private function getNext()
     {
@@ -95,7 +95,7 @@ class MiddlewareService implements ServiceLocatorAwareInterface
 
     /**
     * Returns $redirect() function.
-    * @return callable
+    * @return Closure
     */
     private function getRedirect()
     {

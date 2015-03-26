@@ -17,6 +17,11 @@ class MiddlewareListener implements ListenerAggregateInterface
     protected $listeners = array();
 
     /**
+     * @var MiddlewareService
+     */
+    protected $service;
+
+    /**
      * Attachs onDispatch event.
      * @param EventManagerInterface $eventManager
      */
@@ -49,25 +54,23 @@ class MiddlewareListener implements ListenerAggregateInterface
     public function onDispatch(MvcEvent $event)
     {
         $serviceManager = $event->getApplication()->getServiceManager();
-        $middlewareService = $serviceManager->get('MiddlewareService');
+        $this->service = $serviceManager->get('MiddlewareService');
 
-        if (!$middlewareService->getConfig()) {
+        if (!$this->service->getConfig()) {
             return;
         }
 
-        $middlewareService->setEvent($event);
-
-        $this->handleGlobal($middlewareService);
-        $this->handleLocal($middlewareService);
+        $this->service->setEvent($event);
+        $this->handleGlobal();
+        $this->handleLocal();
     }
 
     /**
      * Handles global middlewares.
-     * @param MiddlewareService $middlewareService
      */
-    protected function handleGlobal(MiddlewareService $middlewareService)
+    protected function handleGlobal()
     {
-        $config  = $middlewareService->getConfig();
+        $config  = $this->service->getConfig();
 
         if (!isset($config[Middleware::CONFIG_GLOBAL]) || !count($config[Middleware::CONFIG_GLOBAL])) {
             return;
@@ -76,22 +79,21 @@ class MiddlewareListener implements ListenerAggregateInterface
         $globals = $config[Middleware::CONFIG_GLOBAL];
 
         foreach ($globals as $middlewareClass) {
-            $middlewareService->run($middlewareClass);
+            $this->service->run($middlewareClass);
         }
     }
 
     /**
      * Handles local middlewares.
-     * @param MiddlewareService $middlewareService
      */
-    protected function handleLocal(MiddlewareService $middlewareService)
+    protected function handleLocal()
     {
-        $controllerClass = $middlewareService->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
+        $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
 
         try {
             $reflection = new Reflection($controllerClass);
             $reflection->getProperty(Middleware::PROPERTY);
-            $controllerClass::$middleware = $middlewareService;
+            $controllerClass::${Middleware::PROPERTY} = $this->service;
         }
         catch (Exception $e) {
             return;

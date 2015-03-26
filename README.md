@@ -1,7 +1,8 @@
 Middleware
 ============
 
-Creates middleware layer on Zend Framework 2. Useful when it's necessary to make some work between route and controller phases.
+Creates middleware layer on Zend Framework 2. Useful when it's necessary to make some work
+between route and controller dispatch phases.
 
 
 Installation
@@ -77,6 +78,8 @@ Usage
     {
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             var_dump($request->getHeader('user-agent'));
         }
     }
@@ -89,6 +92,8 @@ Usage
     {
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             if (true) {
                 return $redirect('http://www.zendframework.com');
             }
@@ -143,13 +148,9 @@ Advanced usage
 
         public function handle($request, $next, $redirect)
         {
+            // My code here. For instance:
+
             $config = $this->serviceLocator->get('config');
-
-            if ($config) {
-                return $redirect('http://www.zendframework.com');
-            }
-
-            $next($request);
         }
 
         public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -169,14 +170,15 @@ Advanced usage
     ```php
     namespace Application\Middleware;
 
+    use Closure;
     use Zend\Http\PhpEnvironment\Request;
     use Middleware\MiddlewareInterface;
 
     class First implements MiddlewareInterface
     {
-        public function handle(Request $request, callable $next, callable $redirect)
+        public function handle(Request $request, Closure $next, Closure $redirect)
         {
-
+            // My code here.
         }
     }
     ```
