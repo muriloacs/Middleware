@@ -28,7 +28,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Middleware\MiddlewareService
+     * @return \Middleware\Service\MiddlewareService
      */
     private function givenService(\Closure $middlewareFactory)
     {

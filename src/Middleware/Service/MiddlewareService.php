@@ -5,7 +5,6 @@ use Middleware\MiddlewareInterface;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
-use Exception;
 
 class MiddlewareService
 {
@@ -40,12 +39,8 @@ class MiddlewareService
      */
     public function run($middlewareClass)
     {
-        try {
-            $middleware = $this->createMiddleware($middlewareClass);
-            $middleware->handle($this->getRequest(), $this->getNext(), $this->getRedirect());
-        } catch(\Exception $e) {
-            return;
-        }
+        $middleware = $this->createMiddleware($middlewareClass);
+        $middleware->handle($this->getRequest(), $this->getNext(), $this->getRedirect());
     }
 
     /**
@@ -73,7 +68,7 @@ class MiddlewareService
      */
     public function getMiddlewareFactory()
     {
-        return $this->middlewareClosureFactory;
+        return $this->middlewareFactory;
     }
 
 
@@ -90,7 +85,7 @@ class MiddlewareService
 
     /**
     * Returns $redirect() function.
-    * @return Closure
+    * @return \Closure
     */
     private function getRedirect()
     {

@@ -3,16 +3,16 @@ namespace Middleware\Listener;
 
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
-use Zend\I18n\Exception\ParseException;
 use Zend\Mvc\MvcEvent;
-use Zend\Code\Reflection\ClassReflection as Reflection;
 use Middleware\Service\MiddlewareService;
 use Middleware\Entity\Middleware;
-use Exception;
 
 class MiddlewareListener implements ListenerAggregateInterface
 {
-    protected $globalConfig = array();
+    /**
+     * @var array
+     */
+    protected $config = array();
     /**
      * @var array
      */
@@ -57,22 +57,21 @@ class MiddlewareListener implements ListenerAggregateInterface
     {
         $serviceManager = $event->getApplication()->getServiceManager();
 
-        $this->initConfig($serviceManager);
+        if($serviceManager->has(Middleware::CONFIG)) {
 
-        $this->service = $serviceManager->get('MiddlewareService');
+            $this->initConfig($serviceManager);
 
-        if (!$this->service->getConfig()) {
-            return;
+            $this->service = $serviceManager->get('MiddlewareService');
+            $this->service->setEvent($event);
+
+            $this->handleGlobal();
+            $this->handleLocal();
         }
-
-        $this->service->setEvent($event);
-        $this->handleGlobal();
-        $this->handleLocal();
     }
 
-    private function initConfig($serviceManager) {
-        $config = $serviceManager->has(Middleware::CONFIG) ?  $serviceManager->get(Middleware::CONFIG) : array();
-        $this->globalConfig = isset($config[Middleware::CONFIG_GLOBAL]) ? $config[Middleware::CONFIG_GLOBAL] : array();
+    protected function initConfig($serviceManager) {
+        $this->config = $serviceManager->has(Middleware::CONFIG) ?  $serviceManager->get(Middleware::CONFIG) : array();
+        $this->config[Middleware::CONFIG_GLOBAL] = isset($this->config[Middleware::CONFIG_GLOBAL]) ? $this->config[Middleware::CONFIG_GLOBAL] : array();
     }
 
     /**
@@ -80,7 +79,7 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     protected function handleGlobal()
     {
-        foreach ($this->globalConfig as $middlewareClass) {
+        foreach($this->config[Middleware::CONFIG_GLOBAL] as $middlewareClass) {
             $this->service->run($middlewareClass);
         }
     }
@@ -91,13 +90,8 @@ class MiddlewareListener implements ListenerAggregateInterface
     protected function handleLocal()
     {
         $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
-
-        try {
+        if(property_exists($controllerClass, Middleware::PROPERTY)) {
             $controllerClass::${Middleware::PROPERTY} = $this->service;
         }
-        catch (\Exception $e) {
-            return;
-        }
     }
-
 }

@@ -35,7 +35,6 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $serviceManager = $this->getMock(ServiceManager::class, ['get']);
         $serviceManager->expects($this->at(0))->method('get')->willReturn($this->createRequestMock());
-        $serviceManager->expects($this->at(1))->method('get')->willReturn([]);
         return $serviceManager;
     }
 
