@@ -51,16 +51,18 @@ Configuration
     ```
 
     ```php
-    'middlewares' => [
-        'global' => [
-            'my.first.middleware' => 'Application\Middleware\First'
-        ],
-        'local' => [
-            'my.second.middleware' => 'Application\Middleware\Second'
-        ]
-    ],
+    'middlewares' => array(
+        'global' => array(
+            'my.first.middleware',
+        ),
+    ),
+    'service_manager' => array(
+        'invokables' => array(
+            'my.first.middleware' => 'Application\Middleware\First',
+            'my.second.middleware' => 'Application\Middleware\Second',
+        ),
+    ),
     ```
-
 
 Usage
 -----
@@ -94,14 +96,13 @@ Usage
         {
             // My code here. For instance:
 
-            if (true) {
-                return $redirect('http://www.zendframework.com');
-            }
-
-            $next($request);
+            var_dump($request->getHeader('user-agent'));
         }
     }
     ```
+
+2. Define your middleware classes:
+
 
 #### Global scope
 Middlewares on global scope will be executed everytime a request is made.
