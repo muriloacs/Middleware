@@ -23,14 +23,6 @@ class MiddlewareServiceFactory implements FactoryInterface
     private function createMiddlewareFactory(ServiceLocatorInterface $serviceManager)
     {
         return function($middlewareClass) use($serviceManager){
-            if(!$serviceManager->has($middlewareClass)) {
-                if(class_exists($middlewareClass)) {
-                    $serviceManager->setInvokableClass($middlewareClass, $middlewareClass);
-                }
-                else {
-                    throw new \InvalidArgumentException("Class or Service $middlewareClass not found");
-                }
-            }
             return $serviceManager->get($middlewareClass);
         };
     }
