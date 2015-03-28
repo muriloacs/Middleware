@@ -101,9 +101,6 @@ Usage
     }
     ```
 
-2. Define your middleware classes:
-
-
 #### Global scope
 Middlewares on global scope will be executed everytime a request is made.
 
