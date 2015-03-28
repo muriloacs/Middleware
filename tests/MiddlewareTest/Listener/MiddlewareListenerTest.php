@@ -3,21 +3,30 @@
 namespace MiddlewareTest\Listener;
 
 
-use Middleware\Entity\Middleware;
 use Middleware\Listener\MiddlewareListener;
 
 class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase {
 
-    public function testWhenNotHasConfigurationOnDispatchNotShouldTryGetMiddlewareService() {
+    public function testWhenGlobalConfigurationIsNotFoundOnDispatchShouldNotRunGlobalMiddleware() {
 
-        $listener       = $this->givenListener();
-        $mvcEvent       = $this->givenMvcEventStub();
-        $application    = $this->givenApplicationStub();
-        $serviceManager = $this->givenServiceManagerStub();
+        $listener           = $this->givenListener();
+        $mvcEvent           = $this->givenMvcEventStub();
+        $application        = $this->givenApplicationStub();
+        $serviceManager     = $this->givenServiceManagerStub();
+        $middlewareService  = $this->givenMiddlewareServiceStub();
+        $routeMatch         = $this->givenRouteMatch();
 
-        $mvcEvent->expects($this->once())->method('getApplication')->willReturn($application);
+        $mvcEvent->expects($this->at(0))->method('getApplication')->willReturn($application);
         $application->expects($this->once())->method('getServiceManager')->willReturn($serviceManager);
-        $serviceManager->expects($this->once())->method('get')->willReturn([]);
+        $serviceManager->expects($this->at(0))->method('get')->willReturn($this->givenMiddlewareConfig());
+        $serviceManager->expects($this->at(1))->method('get')->with($this->equalTo('MiddlewareService'))->willReturn($middlewareService);
+
+        $middlewareService->expects($this->at(0))->method('setEvent');
+        $middlewareService->expects($this->never())->method('run');
+
+        $middlewareService->expects($this->at(1))->method('getEvent')->willReturn($mvcEvent);
+        $mvcEvent->expects($this->at(1))->method('getRouteMatch')->willReturn($routeMatch);
+        $routeMatch->expects($this->once())->method('getParam')->willReturn('');
 
         $listener->onDispatch($mvcEvent);
     }
@@ -28,6 +37,19 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase {
     private function givenListener()
     {
         return new MiddlewareListener();
+    }
+
+    /**
+     * @param array $global
+     * @return array
+     */
+    private function givenMiddlewareConfig($global = array())
+    {
+        return array(
+            MiddlewareListener::CONFIG => array(
+                MiddlewareListener::CONFIG_GLOBAL => $global
+            )
+        );
     }
 
     /**
@@ -44,7 +66,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase {
      */
     private function givenStub($className)
     {
-        return $this->getMockForAbstractClass($className, [], '', false, false, true, get_class_methods($className));
+        return $this->getMockForAbstractClass($className, array(), '', false, false, true, get_class_methods($className));
     }
 
     /**
@@ -63,30 +85,6 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase {
         return $this->givenStub('Zend\ServiceManager\ServiceManager');
     }
 
-    public function testWhenGlobalConfigurationIsNotFoundOnDispatchShouldNotRunGlobalMiddleware() {
-
-        $listener           = $this->givenListener();
-        $mvcEvent           = $this->givenMvcEventStub();
-        $application        = $this->givenApplicationStub();
-        $serviceManager     = $this->givenServiceManagerStub();
-        $middlewareService  = $this->givenMiddlewareServiceStub();
-        $routeMatch         = $this->givenRouteMatch();
-
-        $mvcEvent->expects($this->at(0))->method('getApplication')->willReturn($application);
-        $application->expects($this->once())->method('getServiceManager')->willReturn($serviceManager);
-        $serviceManager->expects($this->at(0))->method('get')->willReturn([Middleware::CONFIG => []]);
-        $serviceManager->expects($this->at(1))->method('get')->with($this->equalTo('MiddlewareService'))->willReturn($middlewareService);
-
-        $middlewareService->expects($this->at(0))->method('setEvent');
-        $middlewareService->expects($this->never())->method('run');
-
-        $middlewareService->expects($this->at(1))->method('getEvent')->willReturn($mvcEvent);
-        $mvcEvent->expects($this->at(1))->method('getRouteMatch')->willReturn($routeMatch);
-        $routeMatch->expects($this->once())->method('getParam')->willReturn('');
-
-        $listener->onDispatch($mvcEvent);
-    }
-
     public function testWhenGlobalConfigurationIsFoundOnDispatchShouldRunGlobalMiddleware() {
 
         $listener           = $this->givenListener();
@@ -98,7 +96,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase {
 
         $mvcEvent->expects($this->at(0))->method('getApplication')->willReturn($application);
         $application->expects($this->once())->method('getServiceManager')->willReturn($serviceManager);
-        $serviceManager->expects($this->at(0))->method('get')->willReturn(array(Middleware::CONFIG => array(Middleware::CONFIG_GLOBAL => array('Test') )));
+        $serviceManager->expects($this->at(0))->method('get')->willReturn($this->givenMiddlewareConfig(array('Test')));
         $serviceManager->expects($this->at(1))->method('get')->with($this->equalTo('MiddlewareService'))->willReturn($middlewareService);
 
         $middlewareService->expects($this->at(0))->method('setEvent');

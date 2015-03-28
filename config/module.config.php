@@ -1,10 +1,15 @@
 <?php
 namespace Middleware;
 
-return [
-    'service_manager' => [
-        'factories' =>[
+return array(
+    'service_manager' => array(
+        'factories' => array(
             'MiddlewareService' => __NAMESPACE__ . '\Service\Factory\MiddlewareServiceFactory'
-        ]
-    ]
-];
+        )
+    ),
+    'middlewares' => array(
+        'global' => array(
+
+        ),
+    ),
+);

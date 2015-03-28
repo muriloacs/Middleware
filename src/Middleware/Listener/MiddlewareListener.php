@@ -5,10 +5,13 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Middleware\Service\MiddlewareService;
-use Middleware\Entity\Middleware;
 
 class MiddlewareListener implements ListenerAggregateInterface
 {
+    const CONFIG = 'middlewares';
+    const CONFIG_GLOBAL = 'global';
+    const PROPERTY = 'middleware';
+
     /**
      * @var array
      */
@@ -59,22 +62,12 @@ class MiddlewareListener implements ListenerAggregateInterface
 
         $config = $serviceManager->get('Config');
 
-        if(isset($config[Middleware::CONFIG])) {
+        $this->config = $config[self::CONFIG];
+        $this->service = $serviceManager->get('MiddlewareService');
+        $this->service->setEvent($event);
 
-            $this->initConfig($config);
-
-            $this->service = $serviceManager->get('MiddlewareService');
-            $this->service->setEvent($event);
-
-            $this->handleGlobal();
-            $this->handleLocal();
-        }
-    }
-
-    protected function initConfig(array $config)
-    {
-        $this->config = isset($config[Middleware::CONFIG]) ?  $config[Middleware::CONFIG] : array();
-        $this->config[Middleware::CONFIG_GLOBAL] = isset($config[Middleware::CONFIG], $config[Middleware::CONFIG][Middleware::CONFIG_GLOBAL]) ? $config[Middleware::CONFIG][Middleware::CONFIG_GLOBAL] : array();
+        $this->handleGlobal();
+        $this->handleLocal();
     }
 
     /**
@@ -82,8 +75,10 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     protected function handleGlobal()
     {
-        foreach($this->config[Middleware::CONFIG_GLOBAL] as $middlewareClass) {
-            $this->service->run($middlewareClass);
+        $middlewares = $this->config[self::CONFIG_GLOBAL];
+
+        foreach($middlewares as $middleware) {
+            $this->service->run($middleware);
         }
     }
 
@@ -93,8 +88,8 @@ class MiddlewareListener implements ListenerAggregateInterface
     protected function handleLocal()
     {
         $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
-        if(property_exists($controllerClass, Middleware::PROPERTY)) {
-            $controllerClass::${Middleware::PROPERTY} = $this->service;
+        if(property_exists($controllerClass, self::PROPERTY)) {
+            $controllerClass::${self::PROPERTY} = $this->service;
         }
     }
 }
