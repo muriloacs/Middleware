@@ -153,7 +153,7 @@ Advanced usage
     {
         protected $serviceLocator;
 
-        public function handle($request, $next, $redirect)
+        public function __invoke($request, $next, $redirect)
         {
             // My code here. For instance:
 
