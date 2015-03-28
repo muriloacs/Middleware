@@ -54,12 +54,21 @@ Configuration
     'middlewares' => array(
         'global' => array(
             'my.first.middleware',
+            'my.three.middleware'
         ),
     ),
     'service_manager' => array(
         'invokables' => array(
             'my.first.middleware' => 'Application\Middleware\First',
             'my.second.middleware' => 'Application\Middleware\Second',
+        ),
+        'services' => array(
+            'my.three.middleware' => function($request, $next, $redirect) {
+                // My code here. For instance:
+
+                var_dump($request->getHeader('user-agent'));
+
+            },
         ),
     ),
     ```
@@ -78,7 +87,7 @@ Usage
 
     class First
     {
-        public function handle($request, $next, $redirect)
+        public function __invoke($request, $next, $redirect)
         {
             // My code here. For instance:
 
@@ -92,7 +101,7 @@ Usage
 
     class Second
     {
-        public function handle($request, $next, $redirect)
+        public function __invoke($request, $next, $redirect)
         {
             // My code here. For instance:
 
@@ -124,7 +133,7 @@ Middlewares on local scope will be executed only if declared inside a controller
     }
     ```
 
-In this case, `my.first.middleware` will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
+In this case, `my.first.middleware` and `my.three.middleware`  will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
 Application\Controller\IndexController is called. Thus, if we access Application\Controller\IndexController both middlewares first and second will be executed.
 
 
@@ -174,7 +183,7 @@ Advanced usage
 
     class First implements MiddlewareInterface
     {
-        public function handle(Request $request, Closure $next, Closure $redirect)
+        public function __invoke(Request $request, Closure $next, Closure $redirect)
         {
             // My code here.
         }

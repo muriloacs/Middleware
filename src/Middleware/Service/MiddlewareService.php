@@ -40,21 +40,21 @@ class MiddlewareService
     public function run($middlewareClass)
     {
         $middleware = $this->createMiddleware($middlewareClass);
-        $middleware->handle($this->getRequest(), $this->getNext(), $this->getRedirect());
+        $middleware($this->getRequest(), $this->getNext(), $this->getRedirect());
     }
 
     /**
      * Called within controllers
      * @param string $middlewareClass Name of the middleware which is being called.
      */
-    public function __invoke($middlewareClass)
+    public function __invoke($middlewareName)
     {
-        $this->run($middlewareClass);
+        $this->run($middlewareName);
     }
 
     /**
      * @param string
-     * @return MiddlewareInterface
+     * @return \Closure
      */
     private function createMiddleware($middlewareClass)
     {

@@ -22,7 +22,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
 
         $service->setMiddlewareFactory($factory);
 
-        $middleware->expects($this->once())->method('handle');
+        $middleware->expects($this->once())->method('__invoke');
 
         $service($middlewareClass);
     }

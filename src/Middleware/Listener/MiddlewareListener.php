@@ -75,10 +75,10 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     protected function handleGlobal()
     {
-        $middlewares = $this->config[self::CONFIG_GLOBAL];
+        $middlewaresNames = $this->config[self::CONFIG_GLOBAL];
 
-        foreach($middlewares as $middleware) {
-            $this->service->run($middleware);
+        foreach($middlewaresNames as $middlewaresName) {
+            $this->service->run($middlewaresName);
         }
     }
 
