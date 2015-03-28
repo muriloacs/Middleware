@@ -57,9 +57,11 @@ class MiddlewareListener implements ListenerAggregateInterface
     {
         $serviceManager = $event->getApplication()->getServiceManager();
 
-        if($serviceManager->has(Middleware::CONFIG)) {
+        $config = $serviceManager->get('Config');
 
-            $this->initConfig($serviceManager);
+        if(isset($config[Middleware::CONFIG])) {
+
+            $this->initConfig($config);
 
             $this->service = $serviceManager->get('MiddlewareService');
             $this->service->setEvent($event);
@@ -69,9 +71,10 @@ class MiddlewareListener implements ListenerAggregateInterface
         }
     }
 
-    protected function initConfig($serviceManager) {
-        $this->config = $serviceManager->has(Middleware::CONFIG) ?  $serviceManager->get(Middleware::CONFIG) : array();
-        $this->config[Middleware::CONFIG_GLOBAL] = isset($this->config[Middleware::CONFIG_GLOBAL]) ? $this->config[Middleware::CONFIG_GLOBAL] : array();
+    protected function initConfig(array $config)
+    {
+        $this->config = isset($config[Middleware::CONFIG]) ?  $config[Middleware::CONFIG] : array();
+        $this->config[Middleware::CONFIG_GLOBAL] = isset($config[Middleware::CONFIG], $config[Middleware::CONFIG][Middleware::CONFIG_GLOBAL]) ? $config[Middleware::CONFIG][Middleware::CONFIG_GLOBAL] : array();
     }
 
     /**
