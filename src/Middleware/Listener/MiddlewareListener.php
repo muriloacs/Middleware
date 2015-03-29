@@ -74,7 +74,10 @@ class MiddlewareListener implements ListenerAggregateInterface
         $this->service->setEvent($event);
 
         $this->handleGlobal($event->getName());
-        $this->handleLocal();
+
+        if($event->getName() == MvcEvent::EVENT_DISPATCH) {
+            $this->handleLocal();
+        }
     }
 
     /**
