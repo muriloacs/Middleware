@@ -12,8 +12,10 @@ class Module implements
 {
     public function onBootstrap(EventInterface $e)
     {
+        $listener = new MiddlewareListener();
         $eventManager = $e->getTarget()->getEventManager();
         $eventManager->attach(new MiddlewareListener());
+        $listener->onMvcEvent($e);
     }
     
     public function getConfig()
