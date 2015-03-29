@@ -33,8 +33,15 @@ class MiddlewareListener implements ListenerAggregateInterface
     public function attach(EventManagerInterface $eventManager)
     {
         $this->listeners[] = $eventManager->attach(
-            MvcEvent::EVENT_DISPATCH,
-            array($this, 'onDispatch'),
+            array(
+                MvcEvent::EVENT_BOOTSTRAP,
+                MvcEvent::EVENT_ROUTE,
+                MvcEvent::EVENT_DISPATCH,
+                MvcEvent::EVENT_DISPATCH_ERROR,
+                MvcEvent::EVENT_RENDER,
+                MvcEvent::EVENT_FINISH
+            ),
+            array($this, 'onMvcEvent'),
             100
         );
     }
@@ -56,7 +63,7 @@ class MiddlewareListener implements ListenerAggregateInterface
      * On dispatch handles local and global middlewares.
      * @param MvcEvent $event
      */
-    public function onDispatch(MvcEvent $event)
+    public function onMvcEvent(MvcEvent $event)
     {
         $serviceManager = $event->getApplication()->getServiceManager();
 
@@ -66,16 +73,16 @@ class MiddlewareListener implements ListenerAggregateInterface
         $this->service = $serviceManager->get('MiddlewareService');
         $this->service->setEvent($event);
 
-        $this->handleGlobal();
+        $this->handleGlobal($event->getName());
         $this->handleLocal();
     }
 
     /**
      * Handles global middlewares.
      */
-    protected function handleGlobal()
+    protected function handleGlobal($eventName)
     {
-        $middlewaresNames = $this->config[self::CONFIG_GLOBAL];
+        $middlewaresNames = $this->config[self::CONFIG_GLOBAL][$eventName];
 
         foreach($middlewaresNames as $middlewaresName) {
             $this->service->run($middlewaresName);
