@@ -11,7 +11,7 @@
 
 namespace Middleware\Service;
 
-use Middleware\MiddlewareInterface;
+use Closure;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
@@ -29,33 +29,38 @@ class MiddlewareService
     private $event;
 
     /**
-     * @var \Closure
+     * @var Closure
      */
     private $middlewareFactory;
 
     /**
-     * @param Request $request
-     * @param \Closure  $middlewareFactory
+     * @var Closure
      */
-    public function __construct(Request $request, \Closure $middlewareFactory)
+    private $middlewareClosureFactory;
+
+    /**
+     * @param Request $request
+     * @param Closure $middlewareFactory
+     */
+    public function __construct(Request $request, Closure $middlewareFactory)
     {
         $this->request = $request;
         $this->middlewareFactory = $middlewareFactory;
     }
 
     /**
-     * Instantiates middleware class and runs its handle() method.
-     * @param string $middlewareClass
+     * Instantiates middleware class and runs its __invoke() method.
+     * @param string $middlewareName Name of the middleware which is being called.
      */
-    public function run($middlewareClass)
+    public function run($middlewareName)
     {
-        $middleware = $this->createMiddleware($middlewareClass);
+        $middleware = $this->createMiddleware($middlewareName);
         $middleware($this->getRequest(), $this->getNext(), $this->getRedirect());
     }
 
     /**
-     * Called within controllers
-     * @param string $middlewareClass Name of the middleware which is being called.
+     * Called within controllers.
+     * @param string $middlewareName Name of the middleware which is being called.
      */
     public function __invoke($middlewareName)
     {
@@ -63,18 +68,18 @@ class MiddlewareService
     }
 
     /**
-     * @param string
-     * @return \Closure
+     * @param string $middlewareName Name of the middleware which is being called.
+     * @return Closure
      */
-    private function createMiddleware($middlewareClass)
+    private function createMiddleware($middlewareName)
     {
         $factory = $this->getMiddlewareFactory();
-        $middleware = $factory($middlewareClass);
+        $middleware = $factory($middlewareName);
         return $middleware;
     }
 
     /**
-     * @return \Closure
+     * @return Closure
      */
     public function getMiddlewareFactory()
     {
@@ -95,7 +100,7 @@ class MiddlewareService
 
     /**
     * Returns $redirect() function.
-    * @return \Closure
+    * @return Closure
     */
     private function getRedirect()
     {
@@ -124,11 +129,11 @@ class MiddlewareService
     }
 
     /***
-     * @param \Closure $factory
+     * @param Closure $factory
      */
-    public function setMiddlewareFactory(\Closure $middlewareClosureFactory)
+    public function setMiddlewareFactory(Closure $factory)
     {
-        $this->middlewareClosureFactory = $middlewareClosureFactory;
+        $this->middlewareClosureFactory = $factory;
     }
 
     /**

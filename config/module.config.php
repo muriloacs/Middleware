@@ -18,8 +18,6 @@ return array(
         )
     ),
     'middlewares' => array(
-        'global' => array(
-
-        ),
-    ),
+        'global' => array(),
+    )
 );

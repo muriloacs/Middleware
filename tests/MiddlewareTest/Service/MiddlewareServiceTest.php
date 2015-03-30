@@ -64,7 +64,15 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function getStub($className)
     {
-        return $this->getMockForAbstractClass($className, array(), '', false, false, true, get_class_methods($className));
+        return $this->getMockForAbstractClass(
+            $className,
+            array(),
+            '',
+            false,
+            false,
+            true,
+            get_class_methods($className)
+        );
     }
 
     /**

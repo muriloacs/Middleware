@@ -71,8 +71,8 @@ class MiddlewareListener implements ListenerAggregateInterface
         $serviceManager = $event->getApplication()->getServiceManager();
 
         $config = $serviceManager->get('Config');
-
         $this->config = $config[self::CONFIG];
+
         $this->service = $serviceManager->get('MiddlewareService');
         $this->service->setEvent($event);
 
@@ -86,8 +86,7 @@ class MiddlewareListener implements ListenerAggregateInterface
     protected function handleGlobal()
     {
         $middlewaresNames = $this->config[self::CONFIG_GLOBAL];
-
-        foreach($middlewaresNames as $middlewaresName) {
+        foreach ($middlewaresNames as $middlewaresName) {
             $this->service->run($middlewaresName);
         }
     }
@@ -98,7 +97,7 @@ class MiddlewareListener implements ListenerAggregateInterface
     protected function handleLocal()
     {
         $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
-        if(property_exists($controllerClass, self::PROPERTY)) {
+        if (property_exists($controllerClass, self::PROPERTY)) {
             $controllerClass::${self::PROPERTY} = $this->service;
         }
     }
