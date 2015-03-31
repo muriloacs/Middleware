@@ -12,6 +12,7 @@ Installation
 
 1. Add this project in your composer.json:
 
+
 ```json
 "require": {
     "muriloamaral/middleware": "dev-master"
@@ -21,6 +22,7 @@ Installation
 
 2. Now tell composer to download Middleware by running the command:
 
+
 ```bash
 $ php composer.phar update
 ```
@@ -29,6 +31,8 @@ $ php composer.phar update
 #### Post installation
 
 1. Enabling it in your `application.config.php` file.
+
+
 
 ```php
 return array(
@@ -46,9 +50,12 @@ Configuration
 
 1. On your config file set your global and local middlewares. For instance:
 
+
+
 ```bash
 Application/config/module.config.php
 ```
+
 
 ```php
 
@@ -79,9 +86,11 @@ Usage
 
 1. Define your middleware classes:
 
+
 ```bash
 Application/src/Application/Middleware/
 ```
+
 
 ```php
 
@@ -142,8 +151,11 @@ Application\Controller\IndexController is called. Thus, if we access Application
 
 Advanced usage
 --------------
+
 #### Inject Service Locator
+
 It's also possible to access ServiceManager within your middleware classes. It's only necessary to implement ServiceLocatorAwareInterface. For instance:
+
 
 ```php
 
@@ -175,9 +187,11 @@ class First implements ServiceLocatorAwareInterface
 ```
 
 #### Abstract Service Factory
+
 If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us.
 
 1. Define your middleware class, you need implement the `Middleware\MiddlewareInterface`.
+
 
 ```php
 namespace Application\Middleware;
@@ -197,6 +211,7 @@ class First implements MiddlewareInterface
 
 2. Configure your middleware
 
+
 ```php
 'middlewares' => array(
     'global' => array(
@@ -206,6 +221,7 @@ class First implements MiddlewareInterface
 ```
 
 3. Configure the abstract service factory
+
 
 ```php
 'service_manager' => array(
