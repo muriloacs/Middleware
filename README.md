@@ -12,33 +12,33 @@ Installation
 
 1. Add this project in your composer.json:
 
-    ```json
-    "require": {
-        "muriloamaral/middleware": "dev-master"
-    }
-    ```
+```json
+"require": {
+    "muriloamaral/middleware": "dev-master"
+}
+```
 
 
 2. Now tell composer to download Middleware by running the command:
 
-    ```bash
-    $ sudo php composer.phar update
-    ```
+```bash
+$ php composer.phar update
+```
 
 
 #### Post installation
 
 1. Enabling it in your `application.config.php` file.
 
-    ```php
-    return array(
-        'modules' => array(
-            // ...
-            'Middleware',
-        ),
+```php
+return array(
+    'modules' => array(
         // ...
-    );
-    ```
+        'Middleware',
+    ),
+    // ...
+);
+```
 
 
 Configuration
@@ -46,69 +46,72 @@ Configuration
 
 1. On your config file set your global and local middlewares. For instance:
 
-    ```bash
-    Application/config/module.config.php
-    ```
+```bash
+Application/config/module.config.php
+```
 
-    ```php
-    'middlewares' => array(
-        'global' => array(
-            'my.first.middleware',
-            'my.three.middleware'
-        ),
+```php
+
+'middlewares' => array(
+    'global' => array(
+        'my.first.middleware',
+        'my.three.middleware'
     ),
-    'service_manager' => array(
-        'invokables' => array(
-            'my.first.middleware' => 'Application\Middleware\First',
-            'my.second.middleware' => 'Application\Middleware\Second',
-        ),
-        'services' => array(
-            'my.three.middleware' => function($request, $next, $redirect) {
-                // My code here. For instance:
-
-                var_dump($request->getHeader('user-agent'));
-
-            },
-        ),
+),
+'service_manager' => array(
+    'invokables' => array(
+        'my.first.middleware' => 'Application\Middleware\First',
+        'my.second.middleware' => 'Application\Middleware\Second',
     ),
-    ```
+    'services' => array(
+        'my.three.middleware' => function($request, $next, $redirect) {
+            // My code here. For instance:
+
+            var_dump($request->getHeader('user-agent'));
+
+        },
+    ),
+),
+```
 
 Usage
 -----
 
 1. Define your middleware classes:
 
-    ```bash
-    Application/src/Application/Middleware/
-    ```
+```bash
+Application/src/Application/Middleware/
+```
 
-    ```php
-    namespace Application\Middleware;
+```php
 
-    class First
+namespace Application\Middleware;
+
+class First
+{
+    public function __invoke($request, $next, $redirect)
     {
-        public function __invoke($request, $next, $redirect)
-        {
-            // My code here. For instance:
+        // My code here. For instance:
 
-            var_dump($request->getHeader('user-agent'));
-        }
+        var_dump($request->getHeader('user-agent'));
     }
-    ```
+}
+```
 
-    ```php
-    namespace Application\Middleware;
+```php
 
-    class Second
+namespace Application\Middleware;
+
+class Second
+{
+    public function __invoke($request, $next, $redirect)
     {
-        public function __invoke($request, $next, $redirect)
-        {
-            // My code here. For instance:
+        // My code here. For instance:
 
-            var_dump($request->getHeader('user-agent'));
-        }
+        var_dump($request->getHeader('user-agent'));
     }
-    ```
+}
+```
 
 #### Global scope
 Middlewares on global scope will be executed everytime a request is made.
@@ -139,92 +142,75 @@ Application\Controller\IndexController is called. Thus, if we access Application
 
 Advanced usage
 --------------
+#### Inject Service Locator
+It's also possible to access ServiceManager within your middleware classes. It's only necessary to implement ServiceLocatorAwareInterface. For instance:
 
-1. It's also possible to access ServiceManager within your middleware classes. It's only necessary to implement ServiceLocatorAwareInterface. For instance:
+```php
 
-    ```php
-    namespace Application\Middleware;
+namespace Application\Middleware;
 
-    use Zend\ServiceManager\ServiceLocatorAwareInterface;
-    use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
+class First implements ServiceLocatorAwareInterface
+{
+    protected $serviceLocator;
 
-    class First implements ServiceLocatorAwareInterface
+    public function __invoke($request, $next, $redirect)
     {
-        protected $serviceLocator;
-
-        public function __invoke($request, $next, $redirect)
-        {
-            // My code here. For instance:
-
-            $config = $this->serviceLocator->get('config');
-        }
-
-        public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
-        {
-            $this->serviceLocator = $serviceLocator;
-        }
-
-        public function getServiceLocator()
-        {
-            return $this->serviceLocator;
-        }
+        // My code here. For instance:
+        $config = $this->serviceLocator->get('config');
     }
-    ```
 
-2. An advisable approach is to implement MiddlewareInterface on your middleware classes. Just for the patterns...
-
-    ```php
-    namespace Application\Middleware;
-
-    use Closure;
-    use Zend\Http\PhpEnvironment\Request;
-    use Middleware\MiddlewareInterface;
-
-    class First implements MiddlewareInterface
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        public function __invoke(Request $request, Closure $next, Closure $redirect)
-        {
-            // My code here.
-        }
+        $this->serviceLocator = $serviceLocator;
     }
-    ```
-3. If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us,
-the unique requirement is that your middleware implements the MiddlewareInterface.
 
-3.1 Add the abstract service factory on service manager config
-
-    ```php
-    'service_manager' => array(
-        'abstract_factories' => array(
-            'Middleware\Factory\MiddlewareAbstractServiceFactory'
-        ),
-    ...
-    ```
-
-3.2 Create your middleware
-
-    ```php
-    namespace Application\Middleware;
-
-    use Closure;
-    use Zend\Http\PhpEnvironment\Request;
-    use Middleware\MiddlewareInterface;
-
-    class First implements MiddlewareInterface
+    public function getServiceLocator()
     {
-        public function __invoke(Request $request, Closure $next, Closure $redirect)
-        {
-            // My code here.
-        }
+        return $this->serviceLocator;
     }
-    ```
+}
+```
 
-3.3 Add on middleware config
-    ```php
-    'middlewares' => array(
-        'global' => array(
-            'Application\Middleware\First',
-        ),
+#### Abstract Service Factory
+If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us.
+
+1. Define your middleware class, you need implement the `Middleware\MiddlewareInterface`.
+
+```php
+namespace Application\Middleware;
+
+use Closure;
+use Zend\Http\PhpEnvironment\Request;
+use Middleware\MiddlewareInterface;
+
+class First implements MiddlewareInterface
+{
+    public function __invoke(Request $request, Closure $next, Closure $redirect)
+    {
+        // My code here.
+    }
+}
+```
+
+2. Configure your middleware
+
+```php
+'middlewares' => array(
+    'global' => array(
+        'Application\Middleware\First'
     ),
-    ```
+)
+```
+
+3. Configure the abstract service factory
+
+```php
+'service_manager' => array(
+    'abstract_factories' => array(
+        'Middleware\Factory\MiddlewareAbstractServiceFactory'
+    ),
+)
+```
