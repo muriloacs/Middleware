@@ -191,42 +191,36 @@ class First implements ServiceLocatorAwareInterface
 If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us.
 
 1. Define your middleware class, you need implement the `Middleware\MiddlewareInterface`.
-
-
-```php
-namespace Application\Middleware;
-
-use Closure;
-use Zend\Http\PhpEnvironment\Request;
-use Middleware\MiddlewareInterface;
-
-class First implements MiddlewareInterface
-{
-    public function __invoke(Request $request, Closure $next, Closure $redirect)
+    ```php
+    namespace Application\Middleware;
+    
+    use Closure;
+    use Zend\Http\PhpEnvironment\Request;
+    use Middleware\MiddlewareInterface;
+    
+    class First implements MiddlewareInterface
     {
-        // My code here.
+        public function __invoke(Request $request, Closure $next, Closure $redirect)
+        {
+            // My code here.
+        }
     }
-}
-```
+    ```
 
 2. Configure your middleware
-
-
-```php
-'middlewares' => array(
-    'global' => array(
-        'Application\Middleware\First'
-    ),
-)
-```
+    ```php
+    'middlewares' => array(
+        'global' => array(
+            'Application\Middleware\First'
+        ),
+    )
+    ```
 
 3. Configure the abstract service factory
-
-
-```php
-'service_manager' => array(
-    'abstract_factories' => array(
-        'Middleware\Factory\MiddlewareAbstractServiceFactory'
-    ),
-)
-```
+    ```php
+    'service_manager' => array(
+        'abstract_factories' => array(
+            'Middleware\Factory\MiddlewareAbstractServiceFactory'
+        ),
+    )
+    ```
