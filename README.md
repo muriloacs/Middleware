@@ -166,7 +166,7 @@ Advanced usage
 
 #### Abstract Service Factory
 
-If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us.
+If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provided by us.
 
 1. Define your middleware class, you need implement the `Middleware\MiddlewareInterface`.
     ```php
