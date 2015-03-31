@@ -1,11 +1,14 @@
 <?php
+
 /**
  * Murilo Amaral (http://muriloamaral.com)
- * Édipo Rebouças (http://edipo.com.br)
+ * Édipo Rebouças (http://edipo.com.br).
  *
  * @link      https://github.com/muriloacs/Middleware
+ *
  * @copyright Copyright (c) 2015 Murilo Amaral
  * @license   The MIT License (MIT)
+ *
  * @since     File available since Release 1.0
  */
 
@@ -50,6 +53,7 @@ class MiddlewareService
 
     /**
      * Instantiates middleware class and runs its __invoke() method.
+     *
      * @param string $middlewareName Name of the middleware which is being called.
      */
     public function run($middlewareName)
@@ -60,6 +64,7 @@ class MiddlewareService
 
     /**
      * Called within controllers.
+     *
      * @param string $middlewareName Name of the middleware which is being called.
      */
     public function __invoke($middlewareName)
@@ -69,12 +74,14 @@ class MiddlewareService
 
     /**
      * @param string $middlewareName Name of the middleware which is being called.
+     *
      * @return Closure
      */
     private function createMiddleware($middlewareName)
     {
         $factory = $this->getMiddlewareFactory();
         $middleware = $factory($middlewareName);
+
         return $middleware;
     }
 
@@ -86,25 +93,26 @@ class MiddlewareService
         return $this->middlewareFactory;
     }
 
-
     /**
-    * Returns $next() function.
-    * @return Closure
-    */
+     * Returns $next() function.
+     *
+     * @return Closure
+     */
     private function getNext()
     {
-       return function(Request $request) {
+        return function (Request $request) {
            $this->event->setRequest($request);
        };
     }
 
     /**
-    * Returns $redirect() function.
-    * @return Closure
-    */
+     * Returns $redirect() function.
+     *
+     * @return Closure
+     */
     private function getRedirect()
     {
-       return function($url = '/') {
+        return function ($url = '/') {
            $response = $this->event->getResponse();
            $response->setStatusCode(Response::STATUS_CODE_307)
                     ->getHeaders()
@@ -115,7 +123,7 @@ class MiddlewareService
     /**
      * @return Request
      */
-    public function getRequest() 
+    public function getRequest()
     {
         return $this->request;
     }
@@ -123,7 +131,7 @@ class MiddlewareService
     /**
      * @return MvcEvent
      */
-    public function getEvent() 
+    public function getEvent()
     {
         return $this->event;
     }
@@ -139,7 +147,7 @@ class MiddlewareService
     /**
      * @param Request $request
      */
-    public function setRequest(Request $request) 
+    public function setRequest(Request $request)
     {
         $this->request = $request;
     }
@@ -151,5 +159,4 @@ class MiddlewareService
     {
         $this->event = $event;
     }
-
 }

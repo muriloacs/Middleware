@@ -1,11 +1,14 @@
 <?php
+
 /**
  * Murilo Amaral (http://muriloamaral.com)
- * Édipo Rebouças (http://edipo.com.br)
+ * Édipo Rebouças (http://edipo.com.br).
  *
  * @link      https://github.com/muriloacs/Middleware
+ *
  * @copyright Copyright (c) 2015 Murilo Amaral
  * @license   The MIT License (MIT)
+ *
  * @since     File available since Release 1.0
  */
 
@@ -22,7 +25,6 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testInvokeShouldCallHandleMethodFromMiddleware()
     {
-
         $middleware      = $this->givenMiddlewareStub();
         $factory         = $this->givenMiddlewareFactory($middleware);
         $service         = $this->givenService($factory);
@@ -45,6 +47,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
             $this->givenRequestStub(),
             $middlewareFactory
         );
+
         return $service;
     }
 
@@ -54,12 +57,13 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     private function givenRequestStub()
     {
         $request = $this->getStub('Zend\Http\PhpEnvironment\Request');
+
         return $request;
     }
 
-
     /**
      * @param $className
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getStub($className)
@@ -81,6 +85,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     private function givenMiddlewareStub()
     {
         $middleware = $this->getStub('Middleware\MiddlewareInterface');
+
         return $middleware;
     }
 
@@ -90,6 +95,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     private function givenServiceLocatorAwareStub()
     {
         $middleware = $this->getStub('Zend\ServiceManager\ServiceLocatorAwareInterface');
+
         return $middleware;
     }
 
@@ -99,19 +105,19 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     private function givenServiceLocatorStub()
     {
         $middleware = $this->getStub('Zend\ServiceManager\ServiceLocatorInterface');
+
         return $middleware;
     }
 
-
     /**
      * @param $middleware
+     *
      * @return \Closure
      */
     private function givenMiddlewareFactory($middleware)
     {
-        return function($middlewareClass) use($middleware) {
+        return function ($middlewareClass) use ($middleware) {
             return $middleware;
         };
     }
-
 }

@@ -189,3 +189,42 @@ Advanced usage
         }
     }
     ```
+3. If you not wanna declare the middlewares on service manager config key, you can use the abstract service factory provide by us,
+the unique requirement is that your middleware implements the MiddlewareInterface.
+
+3.1 Add the abstract service factory on service manager config
+
+    ```php
+    'service_manager' => array(
+        'abstract_factories' => array(
+            'Middleware\Factory\MiddlewareAbstractServiceFactory'
+        ),
+    ...
+    ```
+
+3.2 Create your middleware
+
+    ```php
+    namespace Application\Middleware;
+
+    use Closure;
+    use Zend\Http\PhpEnvironment\Request;
+    use Middleware\MiddlewareInterface;
+
+    class First implements MiddlewareInterface
+    {
+        public function __invoke(Request $request, Closure $next, Closure $redirect)
+        {
+            // My code here.
+        }
+    }
+    ```
+
+3.3 Add on middleware config
+    ```php
+    'middlewares' => array(
+        'global' => array(
+            'Application\Middleware\First',
+        ),
+    ),
+    ```

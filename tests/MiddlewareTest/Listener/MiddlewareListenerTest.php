@@ -1,11 +1,14 @@
 <?php
+
 /**
  * Murilo Amaral (http://muriloamaral.com)
- * Édipo Rebouças (http://edipo.com.br)
+ * Édipo Rebouças (http://edipo.com.br).
  *
  * @link      https://github.com/muriloacs/Middleware
+ *
  * @copyright Copyright (c) 2015 Murilo Amaral
  * @license   The MIT License (MIT)
+ *
  * @since     File available since Release 1.0
  */
 
@@ -64,14 +67,15 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $global
+     *
      * @return array
      */
     private function givenMiddlewareConfig($global = array())
     {
         return array(
             MiddlewareListener::CONFIG => array(
-                MiddlewareListener::CONFIG_GLOBAL => $global
-            )
+                MiddlewareListener::CONFIG_GLOBAL => $global,
+            ),
         );
     }
 
@@ -85,6 +89,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param strig $className
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function givenStub($className)
@@ -118,7 +123,6 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testWhenGlobalConfigurationIsFoundOnDispatchShouldRunGlobalMiddleware()
     {
-
         $listener           = $this->givenListener();
         $mvcEvent           = $this->givenMvcEventStub();
         $application        = $this->givenApplicationStub();
@@ -168,5 +172,4 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
     {
         return $this->givenStub('Zend\Mvc\Router\RouteMatch');
     }
-
 }

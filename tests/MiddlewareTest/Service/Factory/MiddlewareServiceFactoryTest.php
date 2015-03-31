@@ -1,11 +1,14 @@
 <?php
+
 /**
  * Murilo Amaral (http://muriloamaral.com)
- * Édipo Rebouças (http://edipo.com.br)
+ * Édipo Rebouças (http://edipo.com.br).
  *
  * @link      https://github.com/muriloacs/Middleware
+ *
  * @copyright Copyright (c) 2015 Murilo Amaral
  * @license   The MIT License (MIT)
+ *
  * @since     File available since Release 1.0
  */
 
@@ -18,7 +21,6 @@ use Zend\Http\PhpEnvironment\Request;
 
 class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var MiddlewareServiceFactory
      */
@@ -46,6 +48,7 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
         $serviceManager->expects($this->at(0))
             ->method('get')
             ->willReturn($this->createRequestMock());
+
         return $serviceManager;
     }
 
@@ -55,7 +58,7 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
     private function createRequestMock()
     {
         $request = $this->getMock(Request::class);
+
         return $request;
     }
-
 }

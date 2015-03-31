@@ -1,11 +1,14 @@
 <?php
+
 /**
  * Murilo Amaral (http://muriloamaral.com)
- * Édipo Rebouças (http://edipo.com.br)
+ * Édipo Rebouças (http://edipo.com.br).
  *
  * @link      https://github.com/muriloacs/Middleware
+ *
  * @copyright Copyright (c) 2015 Murilo Amaral
  * @license   The MIT License (MIT)
+ *
  * @since     File available since Release 1.0
  */
 
@@ -38,6 +41,7 @@ class MiddlewareListener implements ListenerAggregateInterface
 
     /**
      * Attachs onDispatch event.
+     *
      * @param EventManagerInterface $eventManager
      */
     public function attach(EventManagerInterface $eventManager)
@@ -51,6 +55,7 @@ class MiddlewareListener implements ListenerAggregateInterface
 
     /**
      * Detachs events.
+     *
      * @param EventManagerInterface $eventManager
      */
     public function detach(EventManagerInterface $eventManager)
@@ -64,6 +69,7 @@ class MiddlewareListener implements ListenerAggregateInterface
 
     /**
      * On dispatch handles local and global middlewares.
+     *
      * @param MvcEvent $event
      */
     public function onDispatch(MvcEvent $event)
@@ -96,7 +102,7 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     protected function handleLocal()
     {
-        $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller') . 'Controller';
+        $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller').'Controller';
         if (property_exists($controllerClass, self::PROPERTY)) {
             $controllerClass::${self::PROPERTY} = $this->service;
         }
