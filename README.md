@@ -123,7 +123,7 @@ class IndexController extends AbstractActionController
         $middleware('my.second.middleware');
     }
 }
-    ```
+```
 
 In this case, `my.first.middleware` and `my.three.middleware`  will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
 Application\Controller\IndexController is called. Thus, if we access Application\Controller\IndexController both middlewares first and second will be executed.
