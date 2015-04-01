@@ -15,7 +15,6 @@
 namespace MiddlewareTest\Service\Factory;
 
 use Middleware\Service\Factory\MiddlewareServiceFactory;
-use Middleware\Service\MiddlewareService;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\ServiceManager\ServiceManager;
 
@@ -36,7 +35,7 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $serviceManager = $this->createServiceManagerMock();
         $actual = $this->factory->createService($serviceManager);
-        $this->assertInstanceOf(MiddlewareService::class, $actual);
+        $this->assertInstanceOf('Middleware\Service\MiddlewareService', $actual);
     }
 
     /**
@@ -44,7 +43,7 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function createServiceManagerMock()
     {
-        $serviceManager = $this->getMock(ServiceManager::class, array('get'));
+        $serviceManager = $this->getMock('Zend\ServiceManager\ServiceManager', array('get'));
         $serviceManager->expects($this->at(0))
             ->method('get')
             ->willReturn($this->createRequestMock());
@@ -57,7 +56,7 @@ class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function createRequestMock()
     {
-        $request = $this->getMock(Request::class);
+        $request = $this->getMock('Zend\Http\PhpEnvironment\Request');
 
         return $request;
     }
