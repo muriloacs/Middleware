@@ -1,4 +1,3 @@
-Master:
 [![Build Status](https://travis-ci.org/muriloacs/Middleware.svg?branch=master)](https://travis-ci.org/muriloacs/Middleware) [![Coverage Status](https://coveralls.io/repos/muriloacs/Middleware/badge.svg?branch=master)](https://coveralls.io/r/muriloacs/Middleware?branch=master)
 
 Middleware
