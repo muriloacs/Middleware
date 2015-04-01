@@ -14,4 +14,7 @@ EOF;
 
 Symfony\CS\Fixer\Contrib\HeaderCommentFixer::setHeader($header);
 
-return Symfony\CS\Config\Config::create()->fixers(array('header_comment','long_array_syntax','ordered_use',))->finder(Symfony\CS\Finder\DefaultFinder::create()->in(__DIR__));
+return Symfony\CS\Config\Config::create()
+    ->fixers(array('header_comment','long_array_syntax','ordered_use'))
+    ->finder(Symfony\CS\Finder\DefaultFinder::create()
+        ->in(__DIR__));
