@@ -1,22 +1,22 @@
 <?php
 
-/**
+/*
  * Murilo Amaral (http://muriloamaral.com)
  * Édipo Rebouças (http://edipo.com.br).
  *
- * @link      https://github.com/muriloacs/Middleware
+ * @link https://github.com/muriloacs/Middleware
  *
  * @copyright Copyright (c) 2015 Murilo Amaral
- * @license   The MIT License (MIT)
+ * @license The MIT License (MIT)
  *
- * @since     File available since Release 1.0
+ * @since File available since Release 1.0
  */
 
 namespace Middleware\Service\Factory;
 
+use Middleware\Service\MiddlewareService;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Middleware\Service\MiddlewareService;
 
 class MiddlewareServiceFactory implements FactoryInterface
 {
