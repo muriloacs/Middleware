@@ -29,6 +29,7 @@ $ php composer.phar update
 Enabling it in your `config/application.config.php` file.
 
 ```php
+
 return array(
     'modules' => array(
         // ...
