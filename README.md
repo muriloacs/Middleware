@@ -48,6 +48,7 @@ On your config file set your global and local middlewares. For instance:
 module/Application/config/module.config.php
 ```
 ```php
+
 // ...
 'middlewares' => array(
     'global' => array(
