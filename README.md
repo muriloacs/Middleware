@@ -227,7 +227,7 @@ If you don't wanna declare the middlewares on service manager config key, you ca
             // ...
         ),
         // ...
-    )
+    ),
     // ...
     ```
 
@@ -243,6 +243,6 @@ If you don't wanna declare the middlewares on service manager config key, you ca
             'Middleware\Factory\MiddlewareAbstractServiceFactory'
         ),
         // ...
-    )
+    ),
     // ...
     ```
