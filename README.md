@@ -131,6 +131,7 @@ Middlewares on local scope will be executed only if declared inside a controller
 module/Application/src/Application/Middleware/First.php
 ```
 ```php
+
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
@@ -199,6 +200,7 @@ If you don't wanna declare the middlewares on service manager config key, you ca
     module/Application/src/Application/Middleware/First.php
     ```
     ```php
+
     namespace Application\Middleware;
     
     use Closure;
@@ -219,6 +221,7 @@ If you don't wanna declare the middlewares on service manager config key, you ca
     module/Application/config/module.config.php
     ```
     ```php
+
     // ...
     'middlewares' => array(
         'global' => array(
@@ -236,6 +239,8 @@ If you don't wanna declare the middlewares on service manager config key, you ca
     module/Application/config/module.config.php
     ```
     ```php
+
+    // ...
     'service_manager' => array(
         // ...
         'abstract_factories' => array(
