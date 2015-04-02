@@ -57,7 +57,7 @@ module/Application/config/module.config.php
         'my.second.middleware'
     ),
     'local' => array(
-        'Application\Controller' => array(
+        'Application\Controller\IndexController' => array(
             'my.third.middleware'        
         ),
     ),
