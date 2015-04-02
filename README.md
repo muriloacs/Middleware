@@ -142,8 +142,7 @@ class IndexController extends AbstractActionController
 
     public function __construct()
     {
-        $middleware = self::$middleware;
-        $middleware('my.second.middleware');
+        call_user_func(self::$middleware, 'my.second.middleware');
     }
 }
 ```
