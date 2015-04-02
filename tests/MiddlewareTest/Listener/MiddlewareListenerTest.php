@@ -58,10 +58,8 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getParam')
             ->willReturn('Key');
 
-
         $middlewareService->expects($this->at(2))->method('run')->with('Test');
         $middlewareService->expects($this->at(3))->method('run')->with('Test3');
-
 
         $listener->onDispatch($mvcEvent);
     }
@@ -85,7 +83,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
             MiddlewareListener::CONFIG => array(
                 MiddlewareListener::CONFIG_GLOBAL => $global,
                 MiddlewareListener::CONFIG_LOCAL => $local,
-            )
+            ),
         );
     }
 
@@ -130,7 +128,6 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
     {
         return $this->givenStub('Zend\ServiceManager\ServiceManager');
     }
-
 
     /**
      * @return \Middleware\Service\MiddlewareService | \PHPUnit_Framework_MockObject_MockObject

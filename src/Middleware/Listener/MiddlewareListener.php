@@ -98,7 +98,8 @@ class MiddlewareListener implements ListenerAggregateInterface
     }
 
     /**
-     * Return  global + local[Controller] middleware names
+     * Return  global + local[Controller] middleware names.
+     *
      * @return array
      */
     protected function getMiddlewareNames()
