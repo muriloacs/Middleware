@@ -248,3 +248,4 @@ If you don't want to declare middlewares inside your service manager config key,
     ),
     // ...
     ```
+    
