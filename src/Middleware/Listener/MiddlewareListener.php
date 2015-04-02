@@ -29,7 +29,12 @@ class MiddlewareListener implements ListenerAggregateInterface
     /**
      * @var array
      */
-    protected $config = array();
+    protected $global = array();
+
+    /**
+     * @var array
+     */
+    protected $local = array();
 
     /**
      * @var array
@@ -79,26 +84,29 @@ class MiddlewareListener implements ListenerAggregateInterface
         $serviceManager = $event->getApplication()->getServiceManager();
 
         $config = $serviceManager->get('Config');
-        $this->config = $config[self::CONFIG];
+
+        $this->global = $config[self::CONFIG][self::CONFIG_GLOBAL];
+        $this->local = $config[self::CONFIG][self::CONFIG_LOCAL];
 
         $this->service = $serviceManager->get('MiddlewareService');
+
         $this->service->setEvent($event);
 
-        $middlewareNames = array_merge($this->config[self::CONFIG_GLOBAL], $this->getLocalMiddlewareNames());
-
-        foreach ($middlewareNames as $middlewareName) {
+        foreach ($this->getMiddlewareNames() as $middlewareName) {
             $this->service->run($middlewareName);
         }
     }
 
-    protected function getLocalMiddlewareNames()
+    /**
+     * Return  global + local[Controller] middleware names
+     * @return array
+     */
+    protected function getMiddlewareNames()
     {
         $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller').'Controller';
 
-        if (isset($this->config[self::CONFIG_LOCAL][$controllerClass])) {
-            return $this->config[self::CONFIG_LOCAL][$controllerClass];
-        }
+        $local = isset($this->local[$controllerClass]) ? $this->local[$controllerClass] : array();
 
-        return array();
+        return array_merge($this->global, $local);
     }
 }

@@ -18,7 +18,7 @@ use Middleware\Listener\MiddlewareListener;
 
 class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testWhenGlobalConfigurationIsNotFoundOnDispatchShouldNotRunGlobalMiddleware()
+    public function testRunShouldRunConfiguredMiddlewareNames()
     {
         $listener           = $this->givenListener();
         $mvcEvent           = $this->givenMvcEventStub();
@@ -30,29 +30,38 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
         $mvcEvent->expects($this->at(0))
             ->method('getApplication')
             ->willReturn($application);
+
         $application->expects($this->once())
             ->method('getServiceManager')
             ->willReturn($serviceManager);
+
         $serviceManager->expects($this->at(0))
-            ->method('get')
-            ->willReturn($this->givenMiddlewareConfig());
+            ->method('get')->with('Config')
+            ->willReturn($this->givenMiddlewareConfig(array('Test'), array('KeyController' => array('Test3'))));
+
         $serviceManager->expects($this->at(1))
             ->method('get')
             ->with($this->equalTo('MiddlewareService'))
             ->willReturn($middlewareService);
 
         $middlewareService->expects($this->at(0))->method('setEvent');
-        $middlewareService->expects($this->never())->method('run');
 
         $middlewareService->expects($this->at(1))
             ->method('getEvent')
             ->willReturn($mvcEvent);
+
         $mvcEvent->expects($this->at(1))
             ->method('getRouteMatch')
             ->willReturn($routeMatch);
+
         $routeMatch->expects($this->once())
             ->method('getParam')
-            ->willReturn('');
+            ->willReturn('Key');
+
+
+        $middlewareService->expects($this->at(2))->method('run')->with('Test');
+        $middlewareService->expects($this->at(3))->method('run')->with('Test3');
+
 
         $listener->onDispatch($mvcEvent);
     }
@@ -70,12 +79,13 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    private function givenMiddlewareConfig($global = array())
+    private function givenMiddlewareConfig($global = array(), $local = array())
     {
         return array(
             MiddlewareListener::CONFIG => array(
                 MiddlewareListener::CONFIG_GLOBAL => $global,
-            ),
+                MiddlewareListener::CONFIG_LOCAL => $local,
+            )
         );
     }
 
@@ -121,44 +131,6 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
         return $this->givenStub('Zend\ServiceManager\ServiceManager');
     }
 
-    public function testWhenGlobalConfigurationIsFoundOnDispatchShouldRunGlobalMiddleware()
-    {
-        $listener           = $this->givenListener();
-        $mvcEvent           = $this->givenMvcEventStub();
-        $application        = $this->givenApplicationStub();
-        $serviceManager     = $this->givenServiceManagerStub();
-        $middlewareService  = $this->givenMiddlewareServiceStub();
-        $routeMatch         = $this->givenRouteMatch();
-
-        $mvcEvent->expects($this->at(0))
-            ->method('getApplication')
-            ->willReturn($application);
-        $application->expects($this->once())
-            ->method('getServiceManager')
-            ->willReturn($serviceManager);
-        $serviceManager->expects($this->at(0))
-            ->method('get')
-            ->willReturn($this->givenMiddlewareConfig(array('Test')));
-        $serviceManager->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('MiddlewareService'))
-            ->willReturn($middlewareService);
-
-        $middlewareService->expects($this->at(0))->method('setEvent');
-        $middlewareService->expects($this->at(1))->method('run');
-
-        $middlewareService->expects($this->at(2))
-            ->method('getEvent')
-            ->willReturn($mvcEvent);
-        $mvcEvent->expects($this->at(1))
-            ->method('getRouteMatch')
-            ->willReturn($routeMatch);
-        $routeMatch->expects($this->once())
-            ->method('getParam')
-            ->willReturn('');
-
-        $listener->onDispatch($mvcEvent);
-    }
 
     /**
      * @return \Middleware\Service\MiddlewareService | \PHPUnit_Framework_MockObject_MockObject
