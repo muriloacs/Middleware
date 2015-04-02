@@ -29,7 +29,6 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
         $factory         = $this->givenMiddlewareFactory($middleware);
         $service         = $this->givenService($factory);
         $middlewareClass = get_class($middleware);
-        $factory         = $this->givenMiddlewareFactory($middleware);
 
         $service->setMiddlewareFactory($factory);
 
@@ -38,14 +37,29 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
         $service($middlewareClass);
     }
 
+    public function testNextShouldCallSetRequest()
+    {
+        $service = $this->givenService(function () {
+            return function ($request, $next, $redirect) {
+                $next($request);
+            };
+        });
+
+        $mvcEvent = $this->givenMvcEventStub();
+        $request = $this->givenRequestStub();
+        $service->setEvent($mvcEvent);
+        $mvcEvent->expects($this->once())->method('setRequest')->with($request);
+        $service->run('somemiddleware');
+    }
+
     /**
      * @return \Middleware\Service\MiddlewareService
      */
-    private function givenService(\Closure $middlewareFactory)
+    private function givenService(\Closure $middlewareFactory = null)
     {
         $service = new MiddlewareService(
             $this->givenRequestStub(),
-            $middlewareFactory
+            $middlewareFactory ?: function(){}
         );
 
         return $service;
@@ -107,6 +121,14 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
         $middleware = $this->getStub('Zend\ServiceManager\ServiceLocatorInterface');
 
         return $middleware;
+    }
+
+    /**
+     * @return \Zend\Mvc\MvcEvent | \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenMvcEventStub()
+    {
+        return $this->getStub('\Zend\Mvc\MvcEvent');
     }
 
     /**
