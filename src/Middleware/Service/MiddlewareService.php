@@ -90,8 +90,9 @@ class MiddlewareService
      */
     protected function getNext()
     {
-        return function (Request $request) {
-           $this->event->setRequest($request);
+        $self = $this;
+        return function (Request $request) use($self) {
+            $self->event->setRequest($request);
         };
     }
 
