@@ -18,28 +18,24 @@ use Closure;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
+use Middleware\MiddlewareInterface;
 
 class MiddlewareService
 {
     /**
      * @var Request
      */
-    private $request;
+    protected $request;
 
     /**
      * @var MvcEvent
      */
-    private $event;
+    protected $event;
 
     /**
      * @var Closure
      */
-    private $middlewareFactory;
-
-    /**
-     * @var Closure
-     */
-    private $middlewareClosureFactory;
+    protected $factory;
 
     /**
      * @param Request $request
@@ -48,7 +44,7 @@ class MiddlewareService
     public function __construct(Request $request, Closure $middlewareFactory)
     {
         $this->request = $request;
-        $this->middlewareFactory = $middlewareFactory;
+        $this->factory = $middlewareFactory;
     }
 
     /**
@@ -73,36 +69,30 @@ class MiddlewareService
     }
 
     /**
+     * Creates middleware.
+     *
      * @param string $middlewareName Name of the middleware which is being called.
      *
-     * @return Closure
+     * @return MiddlewareInterface
      */
-    private function createMiddleware($middlewareName)
+    protected function createMiddleware($middlewareName)
     {
         $factory = $this->getMiddlewareFactory();
-        $middleware = $factory($middlewareName);
-
-        return $middleware;
-    }
-
-    /**
-     * @return Closure
-     */
-    public function getMiddlewareFactory()
-    {
-        return $this->middlewareFactory;
+        return $factory($middlewareName);
     }
 
     /**
      * Returns $next() function.
      *
+     * TODO: make it useful
+     *
      * @return Closure
      */
-    private function getNext()
+    protected function getNext()
     {
         return function (Request $request) {
            $this->event->setRequest($request);
-       };
+        };
     }
 
     /**
@@ -110,14 +100,14 @@ class MiddlewareService
      *
      * @return Closure
      */
-    private function getRedirect()
+    protected function getRedirect()
     {
         return function ($url = '/') {
            $response = $this->event->getResponse();
            $response->setStatusCode(Response::STATUS_CODE_307)
                     ->getHeaders()
                     ->addHeaderLine('Location', $url);
-       };
+        };
     }
 
     /**
@@ -129,22 +119,6 @@ class MiddlewareService
     }
 
     /**
-     * @return MvcEvent
-     */
-    public function getEvent()
-    {
-        return $this->event;
-    }
-
-    /***
-     * @param Closure $factory
-     */
-    public function setMiddlewareFactory(Closure $factory)
-    {
-        $this->middlewareClosureFactory = $factory;
-    }
-
-    /**
      * @param Request $request
      */
     public function setRequest(Request $request)
@@ -153,10 +127,34 @@ class MiddlewareService
     }
 
     /**
+     * @return MvcEvent
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
+    /**
      * @param MvcEvent $event
      */
     public function setEvent(MvcEvent $event)
     {
         $this->event = $event;
+    }
+
+    /**
+     * @return Closure
+     */
+    public function getMiddlewareFactory()
+    {
+        return $this->factory;
+    }
+
+    /***
+     * @param Closure $factory
+     */
+    public function setMiddlewareFactory(Closure $factory)
+    {
+        $this->factory = $factory;
     }
 }

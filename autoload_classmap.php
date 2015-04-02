@@ -13,9 +13,16 @@
  */
 
 return array(
-    'Middleware\Module' => __DIR__.'/Module.php',
-    'Middleware\Service\Factory\MiddlewareServiceFactory' => __DIR__.'/src/Middleware/Service/Factory/MiddlewareServiceFactory.php',
-    'Middleware\Service\MiddlewareService' => __DIR__.'/src/Middleware/Service/MiddlewareService.php',
-    'Middleware\Listener\MiddlewareListener' => __DIR__.'/src/Middleware/Listener/MiddlewareListener.php',
-    'Middleware\Entity\Middleware' => __DIR__.'/src/Middleware/Entity/Middleware.php',
+    'Middleware\Module'
+        => __DIR__.'/Module.php',
+    'Middleware\Listener\MiddlewareListener'
+        => __DIR__.'/src/Middleware/Listener/MiddlewareListener.php',
+    'Middleware\Service\Factory\MiddlewareAbstractServiceFactory'
+        => __DIR__.'/src/Middleware/Service/Factory/MiddlewareAbstractServiceFactory.php',
+    'Middleware\Service\Factory\MiddlewareServiceFactory'
+        => __DIR__.'/src/Middleware/Service/Factory/MiddlewareServiceFactory.php',
+    'Middleware\Service\MiddlewareService'
+        => __DIR__.'/src/Middleware/Service/MiddlewareService.php',
+    'Middleware\MiddlewareInterface'
+        => __DIR__.'/src/Middleware/MiddlewareInterface.php'
 );

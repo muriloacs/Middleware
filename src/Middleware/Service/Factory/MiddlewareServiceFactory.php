@@ -31,9 +31,8 @@ class MiddlewareServiceFactory implements FactoryInterface
     {
         $request = $serviceManager->get('Request');
         $factory = $this->createMiddlewareFactory($serviceManager);
-        $middlewareService = new MiddlewareService($request, $factory);
 
-        return $middlewareService;
+        return new MiddlewareService($request, $factory);
     }
 
     /**
@@ -41,7 +40,7 @@ class MiddlewareServiceFactory implements FactoryInterface
      *
      * @param ServiceLocatorInterface $serviceManager
      *
-     * @return callable
+     * @return \Closure
      */
     private function createMiddlewareFactory(ServiceLocatorInterface $serviceManager)
     {

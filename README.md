@@ -53,10 +53,8 @@ module/Application/config/module.config.php
 // ...
 'middlewares' => array(
     'global' => array(
-        // ...
         'my.first.middleware',
-        'my.three.middleware'
-        // ...
+        'my.third.middleware'
     ),
 ),
 // ...
@@ -71,11 +69,10 @@ module/Application/config/module.config.php
     // ...
     'services' => array(
         // ...
-        'my.three.middleware' => function($request, $next, $redirect) {
+        'my.third.middleware' => function($request, $next, $redirect) {
             // My code here. For instance:
 
             var_dump($request->getHeader('user-agent'));
-
         },
         // ...
     ),
@@ -151,8 +148,8 @@ class IndexController extends AbstractActionController
 }
 ```
 
-In this case, `my.first.middleware` and `my.three.middleware`  will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
-Application\Controller\IndexController is called. Thus, if we access Application\Controller\IndexController both middlewares first and second will be executed.
+In this case, `my.first.middleware` and `my.third.middleware`  will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
+Application\Controller\IndexController is called. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
 
 
 Advanced usage
@@ -196,9 +193,9 @@ class First implements ServiceLocatorAwareInterface
 
 #### Abstract Service Factory
 
-If you don't wanna declare the middlewares on service manager config key, you can use the abstract service factory provided by us.
+If you don't want to declare middlewares inside your service manager config key, you can use the abstract service factory provided by us.
 
-1. Define your middleware class, you need implement the `Middleware\MiddlewareInterface`.
+1. Define your middleware class, you need to implement `Middleware\MiddlewareInterface`.
     ```bash
     module/Application/src/Application/Middleware/First.php
     ```
@@ -228,11 +225,8 @@ If you don't wanna declare the middlewares on service manager config key, you ca
     // ...
     'middlewares' => array(
         'global' => array(
-            // ...
             'Application\Middleware\First'
-            // ...
-        ),
-        // ...
+        )
     ),
     // ...
     ```

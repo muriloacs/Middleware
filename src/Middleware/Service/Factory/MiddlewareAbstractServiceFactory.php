@@ -12,7 +12,7 @@
  * @since File available since Release 1.0
  */
 
-namespace Middleware\Factory;
+namespace Middleware\Service\Factory;
 
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;

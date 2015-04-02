@@ -21,14 +21,15 @@ use Zend\Mvc\MvcEvent;
 
 class MiddlewareListener implements ListenerAggregateInterface
 {
-    const CONFIG = 'middlewares';
+    const CONFIG        = 'middlewares';
     const CONFIG_GLOBAL = 'global';
-    const PROPERTY = 'middleware';
+    const PROPERTY      = 'middleware';
 
     /**
      * @var array
      */
     protected $config = array();
+
     /**
      * @var array
      */
@@ -91,9 +92,9 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     protected function handleGlobal()
     {
-        $middlewaresNames = $this->config[self::CONFIG_GLOBAL];
-        foreach ($middlewaresNames as $middlewaresName) {
-            $this->service->run($middlewaresName);
+        $middlewareNames = $this->config[self::CONFIG_GLOBAL];
+        foreach ($middlewareNames as $middlewareName) {
+            $this->service->run($middlewareName);
         }
     }
 

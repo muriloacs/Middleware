@@ -12,9 +12,9 @@
  * @since File available since Release 1.0
  */
 
-namespace MiddlewareTest\Factory;
+namespace MiddlewareTest\Service\Factory;
 
-use Middleware\Factory\MiddlewareAbstractServiceFactory;
+use Middleware\Service\Factory\MiddlewareAbstractServiceFactory;
 
 class MiddlewareAbstractServiceFactoryTest extends \PHPUnit_Framework_TestCase
 {
