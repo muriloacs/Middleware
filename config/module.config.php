@@ -22,5 +22,6 @@ return array(
     ),
     'middlewares' => array(
         'global' => array(),
+        'local' => array(),
     ),
 );

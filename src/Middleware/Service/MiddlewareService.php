@@ -15,10 +15,10 @@
 namespace Middleware\Service;
 
 use Closure;
+use Middleware\MiddlewareInterface;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
-use Middleware\MiddlewareInterface;
 
 class MiddlewareService
 {
@@ -78,6 +78,7 @@ class MiddlewareService
     protected function createMiddleware($middlewareName)
     {
         $factory = $this->getMiddlewareFactory();
+
         return $factory($middlewareName);
     }
 
@@ -91,7 +92,8 @@ class MiddlewareService
     protected function getNext()
     {
         $event = $this->event;
-        return function (Request $request) use($event) {
+
+        return function (Request $request) use ($event) {
             $event->setRequest($request);
         };
     }

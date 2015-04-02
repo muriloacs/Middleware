@@ -59,7 +59,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = new MiddlewareService(
             $this->givenRequestStub(),
-            $middlewareFactory ?: function(){}
+            $middlewareFactory ?: function () {}
         );
 
         return $service;
