@@ -54,7 +54,12 @@ module/Application/config/module.config.php
 'middlewares' => array(
     'global' => array(
         'my.first.middleware',
-        'my.third.middleware'
+        'my.second.middleware'
+    ),
+    'local' => array(
+        'Application\Controller' => array(
+            'my.third.middleware'        
+        ),
     ),
 ),
 // ...
@@ -125,30 +130,10 @@ class Second
 Middlewares on global scope will be executed everytime a request is made.
 
 #### Local scope
-Middlewares on local scope will be executed only if declared inside a controller. For instance:
+Middlewares on local scope will be executed after than global
 
-```bash
-module/Application/src/Application/Middleware/First.php
-```
-```php
-
-namespace Application\Controller;
-
-use Zend\Mvc\Controller\AbstractActionController;
-
-class IndexController extends AbstractActionController
-{
-    public static $middleware;
-
-    public function __construct()
-    {
-        call_user_func(self::$middleware, 'my.second.middleware');
-    }
-}
-```
-
-In this case, `my.first.middleware` and `my.third.middleware`  will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
-Application\Controller\IndexController is called. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
+In this case, `my.first.middleware` and `my.second.middleware`  will be always executed no matter what route is being called. Whereas `my.third.middleware` will be executed only when
+Application\Controller\IndexController is current controller. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
 
 
 Advanced usage
