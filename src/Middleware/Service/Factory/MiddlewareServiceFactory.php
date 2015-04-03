@@ -30,9 +30,9 @@ class MiddlewareServiceFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceManager)
     {
         $request = $serviceManager->get('Request');
+        $response = $serviceManager->get('Response');
         $factory = $this->createMiddlewareFactory($serviceManager);
-
-        return new MiddlewareService($request, $factory);
+        return new MiddlewareService($request, $response, $factory);
     }
 
     /**

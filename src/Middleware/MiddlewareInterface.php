@@ -16,8 +16,9 @@ namespace Middleware;
 
 use Closure;
 use Zend\Http\PhpEnvironment\Request;
+use Zend\Http\PhpEnvironment\Response;
 
 interface MiddlewareInterface
 {
-    public function __invoke(Request $request, Closure $next, Closure $redirect);
+    public function __invoke(Request $request, Response $response, Closure $next);
 }

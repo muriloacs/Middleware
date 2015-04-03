@@ -24,27 +24,11 @@ class MiddlewareListener implements ListenerAggregateInterface
     const CONFIG        = 'middlewares';
     const CONFIG_GLOBAL = 'global';
     const CONFIG_LOCAL  = 'local';
-    const PROPERTY      = 'middleware';
-
-    /**
-     * @var array
-     */
-    protected $global = array();
-
-    /**
-     * @var array
-     */
-    protected $local = array();
 
     /**
      * @var array
      */
     protected $listeners = array();
-
-    /**
-     * @var MiddlewareService
-     */
-    protected $service;
 
     /**
      * Attachs onDispatch event.
@@ -81,33 +65,15 @@ class MiddlewareListener implements ListenerAggregateInterface
      */
     public function onDispatch(MvcEvent $event)
     {
-        $serviceManager = $event->getApplication()->getServiceManager();
+        $sm = $event->getApplication()->getServiceManager();
+        $service = $sm->get('MiddlewareService');
+        $config = $sm->get('Config');
+        $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
 
-        $config = $serviceManager->get('Config');
+        $global = $config[self::CONFIG][self::CONFIG_GLOBAL];
+        $local  = @$config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass] ?: array();
+        $middlewareNames = array_merge($global, $local);
 
-        $this->global = $config[self::CONFIG][self::CONFIG_GLOBAL];
-        $this->local = $config[self::CONFIG][self::CONFIG_LOCAL];
-
-        $this->service = $serviceManager->get('MiddlewareService');
-
-        $this->service->setEvent($event);
-
-        foreach ($this->getMiddlewareNames() as $middlewareName) {
-            $this->service->run($middlewareName);
-        }
-    }
-
-    /**
-     * Return  global + local[Controller] middleware names.
-     *
-     * @return array
-     */
-    protected function getMiddlewareNames()
-    {
-        $controllerClass = $this->service->getEvent()->getRouteMatch()->getParam('controller').'Controller';
-
-        $local = isset($this->local[$controllerClass]) ? $this->local[$controllerClass] : array();
-
-        return array_merge($this->global, $local);
+        $service->run($middlewareNames);
     }
 }

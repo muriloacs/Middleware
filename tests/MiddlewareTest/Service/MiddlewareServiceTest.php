@@ -30,26 +30,35 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
         $service         = $this->givenService($factory);
         $middlewareClass = get_class($middleware);
 
-        $service->setMiddlewareFactory($factory);
-
         $middleware->expects($this->once())->method('__invoke');
 
-        $service($middlewareClass);
+        $service->run(array($middlewareClass));
     }
 
-    public function testNextShouldCallSetRequest()
+    public function testNextShouldCallNextMiddleware()
     {
-        $service = $this->givenService(function () {
-            return function ($request, $next, $redirect) {
-                $next($request);
-            };
+        $called = 0;
+
+        $middlewareMock = $this->givenMiddlewareStub();
+
+        $service = $this->givenService(function () use(&$called, $middlewareMock){
+
+            $called++;
+
+            if($called ==  1) {
+                return function ($request, $response, $next) use (&$called) {
+                    if ($called < 3) {
+                        $next();
+                    }
+                };
+            }
+
+            return $middlewareMock;
         });
 
-        $mvcEvent = $this->givenMvcEventStub();
-        $request = $this->givenRequestStub();
-        $service->setEvent($mvcEvent);
-        $mvcEvent->expects($this->once())->method('setRequest')->with($request);
-        $service->run('somemiddleware');
+        $middlewareMock->expects($this->once())->method('__invoke');
+
+        $service->run(array('teste1', 'teste2', 'teste3'));
     }
 
     /**
@@ -59,6 +68,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = new MiddlewareService(
             $this->givenRequestStub(),
+            $this->givenResponseStub(),
             $middlewareFactory ?: function () {}
         );
 
@@ -71,6 +81,16 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     private function givenRequestStub()
     {
         $request = $this->getStub('Zend\Http\PhpEnvironment\Request');
+
+        return $request;
+    }
+
+    /**
+     * @return \Zend\Http\PhpEnvironment\Response|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenResponseStub()
+    {
+        $request = $this->getStub('Zend\Http\PhpEnvironment\Response');
 
         return $request;
     }
