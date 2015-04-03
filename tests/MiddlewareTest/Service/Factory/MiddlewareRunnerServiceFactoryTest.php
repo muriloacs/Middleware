@@ -75,7 +75,7 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @covers MiddlewareRunnerServiceFactory::createMiddlewareFactory
+     * @covers \Middleware\Service\Factory\MiddlewareRunnerServiceFactory::createMiddlewareFactory
      */
     public function testMiddlewareFactory()
     {
