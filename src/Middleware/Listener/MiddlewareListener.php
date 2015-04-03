@@ -17,13 +17,10 @@ namespace Middleware\Listener;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
+use Middleware\Service\MiddlewareRunnerService as Service;
 
 class MiddlewareListener extends AbstractListenerAggregate
 {
-    const CONFIG        = 'middlewares';
-    const CONFIG_GLOBAL = 'global';
-    const CONFIG_LOCAL  = 'local';
-
     /**
      * @var array
      */
@@ -55,8 +52,8 @@ class MiddlewareListener extends AbstractListenerAggregate
         $config  = $sm->get('Config');
         $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
 
-        $global = $config[self::CONFIG][self::CONFIG_GLOBAL];
-        $local  = @$config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass] ?: array();
+        $global = $config[Service::CONFIG][Service::CONFIG_GLOBAL];
+        $local  = @$config[Service::CONFIG][Service::CONFIG_LOCAL][$controllerClass] ?: array();
         $middlewareNames = array_merge($global, $local);
 
         $service->run($middlewareNames);

@@ -14,9 +14,12 @@
 
 namespace Middleware\Service\Factory;
 
-use Middleware\Service\MiddlewareRunnerService;
+use Middleware\Service\MiddlewareRunnerService as Service;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\Config;
 
 class MiddlewareRunnerServiceFactory implements FactoryInterface
 {
@@ -32,7 +35,7 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
         $request  = $serviceManager->get('Request');
         $response = $serviceManager->get('Response');
         $factory  = $this->createMiddlewareFactory($serviceManager);
-        return new MiddlewareRunnerService($request, $response, $factory);
+        return new Service($request, $response, $factory);
     }
 
     /**
@@ -44,8 +47,28 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
      */
     private function createMiddlewareFactory(ServiceLocatorInterface $serviceManager)
     {
-        return function ($middlewareName) use ($serviceManager) {
-            return $serviceManager->get($middlewareName);
+        $config = $serviceManager->get('Config');   
+        $middlewareServiceManager = $this->createMiddlewareServiceManager($config);
+
+        return function ($middlewareName) use ($serviceManager, $middlewareServiceManager) {
+            $middleware = $middlewareServiceManager->get($middlewareName);
+            if ($middleware instanceof ServiceLocatorAwareInterface) {
+                $middleware->setServiceLocator($serviceManager);
+            }
+            return $middleware;
         };
+    }
+
+    /**
+     * Creates a custom ServiceManager.
+     *
+     * @param array $config
+     * 
+     * @return ServiceManager
+     */
+    private function createMiddlewareServiceManager(array $config)
+    {
+        $middlewareConfig = new Config($config[Service::CONFIG]);
+        return new ServiceManager($middlewareConfig);
     }
 }

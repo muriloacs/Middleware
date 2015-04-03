@@ -49,7 +49,6 @@ On your config file set your global and local middlewares. For instance:
 module/Application/config/module.config.php
 ```
 ```php
-
 // ...
 'middlewares' => array(
     'global' => array(
@@ -61,9 +60,6 @@ module/Application/config/module.config.php
             'my.third.middleware'        
         ),
     ),
-),
-// ...
-'service_manager' => array(
     // ...
     'invokables' => array(
         // ...
@@ -76,7 +72,6 @@ module/Application/config/module.config.php
         // ...
         'my.third.middleware' => function($request, $response, $next) {
             // My code here. For instance:
-
             var_dump($request->getHeader('user-agent'));
             $next();
         },
@@ -168,10 +163,11 @@ class First implements ServiceLocatorAwareInterface
 {
     protected $serviceLocator;
 
-    public function __invoke($request, $next, $redirect)
+    public function __invoke($request, $response, $next)
     {
         // My code here. For instance:
         $config = $this->serviceLocator->get('config');
+        $next();
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -249,22 +245,25 @@ If you don't want to declare middlewares inside your service manager config key,
 
 You can provide any callable as a middleware name. Such as functions, static methods and so on. For instance:
 
-    ```php
-    'middlewares' => array(
-        'global' => array(
-            'my.first.middleware',
-            'my.second.middleware',
-            'MyNamespace\MyClass::MyStaticMethod', // Static method sample
-            function ($request, $response, $next) // Function sample
-            {
-                var_dump($request->getHeader('user-agent'));
-                $next();    
-            }
+```php
+// ...
+'middlewares' => array(
+    'global' => array(
+        'my.first.middleware',
+        'my.second.middleware',
+        'MyNamespace\MyClass::MyStaticMethod', // Static method sample
+        function ($request, $response, $next) // Function sample
+        {
+            var_dump($request->getHeader('user-agent'));
+            $next();    
+        }
+    ),
+    'local' => array(
+        'Application\Controller\IndexController' => array(
+            'my.third.middleware'        
         ),
-        'local' => array(
-            'Application\Controller\IndexController' => array(
-                'my.third.middleware'        
-            ),
-        ),
-    ),   
+    ),
+    // ...
+),   
+// ...
 ``` 

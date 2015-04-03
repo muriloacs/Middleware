@@ -20,6 +20,10 @@ use Zend\Http\Response;
 
 class MiddlewareRunnerService
 {
+    const CONFIG        = 'middlewares';
+    const CONFIG_GLOBAL = 'global';
+    const CONFIG_LOCAL  = 'local';
+    
     /**
      * @var Request
      */
