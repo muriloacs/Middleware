@@ -42,7 +42,7 @@ class MiddlewareListener extends AbstractListenerAggregate
             100
         );
     }
-    
+
     /**
      * On dispatch handles local and global middlewares.
      *

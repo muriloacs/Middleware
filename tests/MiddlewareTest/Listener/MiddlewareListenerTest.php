@@ -15,6 +15,7 @@
 namespace MiddlewareTest\Listener;
 
 use Middleware\Listener\MiddlewareListener;
+use Zend\Mvc\MvcEvent;
 
 class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -135,5 +136,29 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
     public function givenRouteMatch()
     {
         return $this->givenStub('Zend\Mvc\Router\RouteMatch');
+    }
+
+
+    public function testAttachShouldAttachOnDispatchHandlerToEventManager()
+    {
+        $listener = $this->givenListener();
+        $eventManager = $this->givenEventManagerStub();
+        $eventManager->expects($this->once())
+            ->method('attach')
+            ->with(
+                MvcEvent::EVENT_DISPATCH,
+                array($listener, 'onDispatch'),
+                100
+            );
+
+        $listener->attach($eventManager);
+    }
+
+    /**
+     * @return \Zend\EventManager\EventInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenEventManagerStub()
+    {
+        return $this->givenStub('Zend\EventManager\EventManagerInterface');
     }
 }
