@@ -36,8 +36,9 @@ class MiddlewareRunnerService
     protected $factory;
 
     /**
-     * @param Request $request
-     * @param Closure $middlewareFactory
+     * @param Request  $request
+     * @param Response $response
+     * @param Closure  $middlewareFactory
      */
     public function __construct(Request $request, Response $response, Closure $middlewareFactory)
     {
@@ -47,7 +48,8 @@ class MiddlewareRunnerService
     }
 
     /**
-     * Run the middleware list
+     * Runs the middleware list.
+     * 
      * @param array $middlewareNames
      */
     public function run(array $middlewareNames)
@@ -62,7 +64,9 @@ class MiddlewareRunnerService
     }
 
     /**
-     * Call the next middleware
+     * Calls the next middleware.
+     *
+     * @param array $middlewareNames
      *
      * @return Closure
      */
