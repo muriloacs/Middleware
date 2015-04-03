@@ -59,8 +59,8 @@ class MiddlewareRunnerService
         }
 
         $middlewareName = array_shift($middlewareNames);
-        $middleware     = call_user_func($this->factory, $middlewareName);
-        $middleware($this->request, $this->response, $this->getNext($middlewareNames));
+        $middleware     = is_callable($middlewareName) ? $middlewareName : call_user_func($this->factory, $middlewareName);
+        call_user_func($middleware, $this->request, $this->response, $this->getNext($middlewareNames));
     }
 
     /**
