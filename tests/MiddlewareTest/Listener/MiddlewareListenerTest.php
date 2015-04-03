@@ -24,7 +24,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
         $mvcEvent           = $this->givenMvcEventStub();
         $application        = $this->givenApplicationStub();
         $serviceManager     = $this->givenServiceManagerStub();
-        $middlewareService  = $this->givenMiddlewareServiceStub();
+        $middlewareService  = $this->givenMiddlewareRunnerServiceStub();
         $routeMatch         = $this->givenRouteMatch();
 
         $mvcEvent->expects($this->at(0))
@@ -37,7 +37,7 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 
         $serviceManager->expects($this->at(0))
             ->method('get')
-            ->with($this->equalTo('MiddlewareService'))
+            ->with($this->equalTo('MiddlewareRunnerService'))
             ->willReturn($middlewareService);
 
 
@@ -125,11 +125,11 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Middleware\Service\MiddlewareService | \PHPUnit_Framework_MockObject_MockObject
+     * @return \Middleware\Service\MiddlewareRunnerService | \PHPUnit_Framework_MockObject_MockObject
      */
-    public function givenMiddlewareServiceStub()
+    public function givenMiddlewareRunnerServiceStub()
     {
-        return $this->givenStub('Middleware\Service\MiddlewareService');
+        return $this->givenStub('Middleware\Service\MiddlewareRunnerService');
     }
 
     public function givenRouteMatch()

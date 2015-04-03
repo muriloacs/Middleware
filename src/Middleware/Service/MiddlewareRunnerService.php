@@ -15,11 +15,10 @@
 namespace Middleware\Service;
 
 use Closure;
-use Middleware\MiddlewareInterface;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Http\Response;
 
-class MiddlewareService
+class MiddlewareRunnerService
 {
     /**
      * @var Request

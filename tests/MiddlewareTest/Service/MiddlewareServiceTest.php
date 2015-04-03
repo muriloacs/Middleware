@@ -14,12 +14,12 @@
 
 namespace MiddlewareTest\Service;
 
-use Middleware\Service\MiddlewareService;
+use Middleware\Service\MiddlewareRunnerService;
 
 class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MiddlewareService
+     * @var MiddlewareRunnerService
      */
     private $service;
 
@@ -62,11 +62,11 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Middleware\Service\MiddlewareService
+     * @return \Middleware\Service\MiddlewareRunnerService
      */
     private function givenService(\Closure $middlewareFactory = null)
     {
-        $service = new MiddlewareService(
+        $service = new MiddlewareRunnerService(
             $this->givenRequestStub(),
             $this->givenResponseStub(),
             $middlewareFactory ?: function () {}

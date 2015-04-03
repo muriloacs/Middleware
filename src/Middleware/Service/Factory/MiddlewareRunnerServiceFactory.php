@@ -14,25 +14,25 @@
 
 namespace Middleware\Service\Factory;
 
-use Middleware\Service\MiddlewareService;
+use Middleware\Service\MiddlewareRunnerService;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class MiddlewareServiceFactory implements FactoryInterface
+class MiddlewareRunnerServiceFactory implements FactoryInterface
 {
     /**
      * Creates the MiddlewareService's instance.
      *
      * @param ServiceLocatorInterface $serviceManager
      *
-     * @return MiddlewareService
+     * @return MiddlewareRunnerService
      */
     public function createService(ServiceLocatorInterface $serviceManager)
     {
         $request = $serviceManager->get('Request');
         $response = $serviceManager->get('Response');
         $factory = $this->createMiddlewareFactory($serviceManager);
-        return new MiddlewareService($request, $response, $factory);
+        return new MiddlewareRunnerService($request, $response, $factory);
     }
 
     /**

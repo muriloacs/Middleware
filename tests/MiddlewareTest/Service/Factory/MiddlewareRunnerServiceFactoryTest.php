@@ -14,27 +14,27 @@
 
 namespace MiddlewareTest\Service\Factory;
 
-use Middleware\Service\Factory\MiddlewareServiceFactory;
+use Middleware\Service\Factory\MiddlewareRunnerServiceFactory;
 use Zend\ServiceManager\ServiceManager;
 
-class MiddlewareServiceFactoryTest extends \PHPUnit_Framework_TestCase
+class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MiddlewareServiceFactory
+     * @var MiddlewareRunnerServiceFactory
      */
     private $factory;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->factory = new MiddlewareServiceFactory();
+        $this->factory = new MiddlewareRunnerServiceFactory();
     }
 
     public function testFactoryShouldCreateMiddlewareService()
     {
         $serviceManager = $this->createServiceManagerMock();
         $actual = $this->factory->createService($serviceManager);
-        $this->assertInstanceOf('Middleware\Service\MiddlewareService', $actual);
+        $this->assertInstanceOf('Middleware\Service\MiddlewareRunnerService', $actual);
     }
 
     /**

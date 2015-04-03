@@ -14,7 +14,7 @@
 
 namespace Middleware\Listener;
 
-use Middleware\Service\MiddlewareService;
+use Middleware\Service\MiddlewareRunnerService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
@@ -66,7 +66,7 @@ class MiddlewareListener implements ListenerAggregateInterface
     public function onDispatch(MvcEvent $event)
     {
         $sm = $event->getApplication()->getServiceManager();
-        $service = $sm->get('MiddlewareService');
+        $service = $sm->get('MiddlewareRunnerService');
         $config = $sm->get('Config');
         $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
 
