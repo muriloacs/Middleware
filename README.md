@@ -139,10 +139,12 @@ class Second
 Middlewares on global scope will be executed everytime a request is made.
 
 #### Local scope
-Middlewares on local scope will be executed after than global.
+Middlewares on local scope will be executed only if the current controller declares a middleware.
 
-In this case, `my.first.middleware` and `my.second.middleware`  will be always executed no matter what route is being called. Whereas `my.third.middleware` will be executed only when
-Application\Controller\IndexController is current controller. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
+P.S: local middlewares are executed after global middlewares.
+
+In this case, `my.first.middleware` and `my.second.middleware` will be always executed no matter what route is being called. Whereas `my.third.middleware` will be executed only when
+Application\Controller\IndexController is being called. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
 
 
 Advanced usage
