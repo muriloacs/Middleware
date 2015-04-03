@@ -29,9 +29,9 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceManager)
     {
-        $request = $serviceManager->get('Request');
+        $request  = $serviceManager->get('Request');
         $response = $serviceManager->get('Response');
-        $factory = $this->createMiddlewareFactory($serviceManager);
+        $factory  = $this->createMiddlewareFactory($serviceManager);
         return new MiddlewareRunnerService($request, $response, $factory);
     }
 

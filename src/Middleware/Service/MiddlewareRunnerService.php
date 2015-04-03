@@ -41,9 +41,9 @@ class MiddlewareRunnerService
      */
     public function __construct(Request $request, Response $response, Closure $middlewareFactory)
     {
-        $this->request = $request;
+        $this->request  = $request;
         $this->response = $response;
-        $this->factory = $middlewareFactory;
+        $this->factory  = $middlewareFactory;
     }
 
     /**
@@ -52,13 +52,13 @@ class MiddlewareRunnerService
      */
     public function run(array $middlewareNames)
     {
-        if($middlewareNames) {
-            $middlewareName = array_shift($middlewareNames);
-            $factory = $this->factory;
-            $middleware = $factory($middlewareName);
-            $middleware($this->request, $this->response, $this->getNext($middlewareNames));
+        if (!$middlewareNames) {
+            return;
         }
 
+        $middlewareName = array_shift($middlewareNames);
+        $middleware     = call_user_func($this->factory, $middlewareName);
+        $middleware($this->request, $this->response, $this->getNext($middlewareNames));
     }
 
     /**
