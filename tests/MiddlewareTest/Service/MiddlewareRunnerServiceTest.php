@@ -16,7 +16,7 @@ namespace MiddlewareTest\Service;
 
 use Middleware\Service\MiddlewareRunnerService;
 
-class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
+class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var MiddlewareRunnerService
@@ -35,6 +35,20 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
         $service->run(array($middlewareClass));
     }
 
+    public function testShouldNotCallTheFactoryWhenReceiveZeroMiddlewareNames()
+    {
+        $factoryCallCount = 0;
+
+        $service = $this->givenService(function() use(&$factoryCallCount) {
+            $factoryCallCount++;
+            return function(){};
+        });
+
+        $service->run(array());
+
+        $this->assertEquals(0, $factoryCallCount);
+    }
+
     public function testNextShouldCallNextMiddleware()
     {
         $called = 0;
@@ -45,7 +59,7 @@ class MiddlewareServiceTest extends \PHPUnit_Framework_TestCase
 
             $called++;
 
-            if($called ==  1) {
+            if ($called ==  1) {
                 return function ($request, $response, $next) use (&$called) {
                     if ($called < 3) {
                         $next();
