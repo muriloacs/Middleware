@@ -73,4 +73,15 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
 
         return $request;
     }
+
+
+    public function testMiddlewareFactory()
+    {
+        $serviceManager = $this->createServiceManagerMock();
+        $runner = $this->factory->createService($serviceManager);
+        $serviceManager->expects($this->at(0))->method('get')->with('test1')->willReturn(function(){});
+        $runner->run(array('test1'));
+    }
+
+
 }
