@@ -17,7 +17,7 @@ namespace Middleware;
 return array(
     'service_manager' => array(
         'factories' => array(
-            'MiddlewareService' => __NAMESPACE__.'\Service\Factory\MiddlewareServiceFactory',
+            'MiddlewareRunnerService' => __NAMESPACE__.'\Service\Factory\MiddlewareRunnerServiceFactory',
         ),
     ),
     'middlewares' => array(
