@@ -15,7 +15,6 @@
 namespace MiddlewareTest\Service\Factory;
 
 use Middleware\Service\Factory\MiddlewareRunnerServiceFactory;
-use Zend\ServiceManager\ServiceManager;
 
 class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +37,7 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ServiceManager|\PHPUnit_Framework_MockObject_MockObject|
+     * @return \Zend\ServiceManager\ServiceManager|\PHPUnit_Framework_MockObject_MockObject|
      */
     private function createServiceManagerMock()
     {
@@ -75,11 +74,19 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * @covers MiddlewareRunnerServiceFactory::createMiddlewareFactory
+     */
     public function testMiddlewareFactory()
     {
         $serviceManager = $this->createServiceManagerMock();
         $runner = $this->factory->createService($serviceManager);
-        $serviceManager->expects($this->at(0))->method('get')->with('test1')->willReturn(function(){});
+
+        $serviceManager->expects($this->at(0))
+            ->method('get')
+            ->with('test1')
+            ->willReturn(function(){});
+
         $runner->run(array('test1'));
     }
 
