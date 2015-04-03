@@ -74,10 +74,11 @@ module/Application/config/module.config.php
     // ...
     'services' => array(
         // ...
-        'my.third.middleware' => function($request, $next, $redirect) {
+        'my.third.middleware' => function($request, $response, $next) {
             // My code here. For instance:
 
             var_dump($request->getHeader('user-agent'));
+            $next();
         },
         // ...
     ),
@@ -100,11 +101,15 @@ namespace Application\Middleware;
 
 class First
 {
-    public function __invoke($request, $next, $redirect)
+    public function __invoke($request, $response, $next)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
+
+        $next(); // call the next middleware
+
+        // Run code after all middlewares run
     }
 }
 ```
@@ -117,11 +122,15 @@ namespace Application\Middleware;
 
 class Second
 {
-    public function __invoke($request, $next, $redirect)
+    public function __invoke($request, $response, $next)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
+        
+        $next(); // call the next middleware
+
+        // Run code after all middlewares run
     }
 }
 ```
@@ -189,11 +198,12 @@ If you don't want to declare middlewares inside your service manager config key,
     
     use Closure;
     use Zend\Http\PhpEnvironment\Request;
+    use Zend\Http\PhpEnvironment\Response;
     use Middleware\MiddlewareInterface;
     
     class First implements MiddlewareInterface
     {
-        public function __invoke(Request $request, Closure $next, Closure $redirect)
+        public function __invoke(Request $request, Response $response, Closure $next)
         {
             // My code here.
         }

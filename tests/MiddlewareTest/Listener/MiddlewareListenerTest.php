@@ -36,30 +36,25 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($serviceManager);
 
         $serviceManager->expects($this->at(0))
-            ->method('get')->with('Config')
-            ->willReturn($this->givenMiddlewareConfig(array('Test'), array('KeyController' => array('Test3'))));
-
-        $serviceManager->expects($this->at(1))
             ->method('get')
             ->with($this->equalTo('MiddlewareService'))
             ->willReturn($middlewareService);
 
-        $middlewareService->expects($this->at(0))->method('setEvent');
 
-        $middlewareService->expects($this->at(1))
-            ->method('getEvent')
-            ->willReturn($mvcEvent);
+        $serviceManager->expects($this->at(1))
+            ->method('get')->with('Config')
+            ->willReturn($this->givenMiddlewareConfig(array('Test'), array('KeyController' => array('Test3'))));
+
 
         $mvcEvent->expects($this->at(1))
             ->method('getRouteMatch')
             ->willReturn($routeMatch);
 
-        $routeMatch->expects($this->once())
+        $routeMatch->expects($this->at(0))
             ->method('getParam')
             ->willReturn('Key');
 
-        $middlewareService->expects($this->at(2))->method('run')->with('Test');
-        $middlewareService->expects($this->at(3))->method('run')->with('Test3');
+        $middlewareService->expects($this->at(0))->method('run')->with(array('Test', 'Test3'));
 
         $listener->onDispatch($mvcEvent);
     }
