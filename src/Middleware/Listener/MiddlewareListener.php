@@ -52,7 +52,7 @@ class MiddlewareListener extends AbstractListenerAggregate
     {
         $sm = $event->getApplication()->getServiceManager();
         $service = $sm->get('MiddlewareRunnerService');
-        $config = $sm->get('Config');
+        $config  = $sm->get('Config');
         $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
 
         $global = $config[self::CONFIG][self::CONFIG_GLOBAL];
