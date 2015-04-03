@@ -244,4 +244,27 @@ If you don't want to declare middlewares inside your service manager config key,
     ),
     // ...
     ```
-    
+
+#### Configuration
+
+You can provide any callable as a middleware name. Such as functions, static methods and so on. For instance:
+
+    ```php
+    'middlewares' => array(
+        'global' => array(
+            'my.first.middleware',
+            'my.second.middleware',
+            'MyNamespace\MyClass::MyStaticMethod', // Static method sample
+            function ($request, $response, $next) // Function sample
+            {
+                var_dump($request->getHeader('user-agent'));
+                $next();    
+            }
+        ),
+        'local' => array(
+            'Application\Controller\IndexController' => array(
+                'my.third.middleware'        
+            ),
+        ),
+    ),   
+``` 
