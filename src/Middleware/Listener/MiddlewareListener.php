@@ -14,12 +14,11 @@
 
 namespace Middleware\Listener;
 
-use Middleware\Service\MiddlewareRunnerService;
+use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
 
-class MiddlewareListener implements ListenerAggregateInterface
+class MiddlewareListener extends AbstractListenerAggregate
 {
     const CONFIG        = 'middlewares';
     const CONFIG_GLOBAL = 'global';
@@ -43,21 +42,7 @@ class MiddlewareListener implements ListenerAggregateInterface
             100
         );
     }
-
-    /**
-     * Detachs events.
-     *
-     * @param EventManagerInterface $eventManager
-     */
-    public function detach(EventManagerInterface $eventManager)
-    {
-        foreach ($this->listeners as $index => $listener) {
-            if ($eventManager->detach($listener)) {
-                unset($this->listeners[$index]);
-            }
-        }
-    }
-
+    
     /**
      * On dispatch handles local and global middlewares.
      *
