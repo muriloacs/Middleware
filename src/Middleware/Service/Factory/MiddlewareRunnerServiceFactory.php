@@ -15,8 +15,10 @@
 namespace Middleware\Service\Factory;
 
 use Middleware\Service\MiddlewareRunnerService;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\ServiceManager;
 
 class MiddlewareRunnerServiceFactory implements FactoryInterface
 {
@@ -42,9 +44,14 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
      *
      * @return \Closure
      */
-    private function createMiddlewareFactory(ServiceLocatorInterface $serviceManager)
+    private function createMiddlewareFactory(ServiceManager $serviceManager)
     {
         return function ($middlewareName) use ($serviceManager) {
+
+            if (!$serviceManager->has($middlewareName, false, false) && class_exists($middlewareName)) {
+                $serviceManager->setInvokableClass($middlewareName, $middlewareName);
+            }
+
             return $serviceManager->get($middlewareName);
         };
     }

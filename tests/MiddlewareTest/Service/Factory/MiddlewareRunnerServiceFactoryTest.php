@@ -29,6 +29,9 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory = new MiddlewareRunnerServiceFactory();
     }
 
+    /**
+     * @covers \Middleware\Service\Factory\MiddlewareRunnerServiceFactory::createService
+     */
     public function testFactoryShouldCreateMiddlewareService()
     {
         $serviceManager = $this->createServiceManagerMock();
@@ -41,7 +44,8 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function createServiceManagerMock()
     {
-        $serviceManager = $this->getMock('Zend\ServiceManager\ServiceManager', array('get'));
+        $class = 'Zend\ServiceManager\ServiceManager';
+        $serviceManager = $this->getMock($class, get_class_methods($class));
         $serviceManager->expects($this->at(0))
             ->method('get')
             ->willReturn($this->createRequestStub());
@@ -83,12 +87,24 @@ class MiddlewareRunnerServiceFactoryTest extends \PHPUnit_Framework_TestCase
         $runner = $this->factory->createService($serviceManager);
 
         $serviceManager->expects($this->at(0))
+            ->method('has')
+            ->with(__NAMESPACE__ . '\test1', false, false)
+            ->willReturn(false);
+
+        $serviceManager->expects($this->at(1))
+            ->method('setService');
+
+        $serviceManager->expects($this->at(2))
             ->method('get')
-            ->with('test1')
+            ->with(__NAMESPACE__ . '\test1')
             ->willReturn(function(){});
 
-        $runner->run(array('test1'));
+        $runner->run(array(__NAMESPACE__ . '\test1'));
     }
 
 
+}
+
+class test1 {
+    public function __invoke(){}
 }
