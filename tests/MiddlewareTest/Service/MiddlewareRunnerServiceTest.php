@@ -72,7 +72,13 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 
         $middlewareMock->expects($this->once())->method('__invoke');
 
-        $service->run(array('teste1', 'teste2', 'teste3'));
+        $service->run(array(
+            function($request, $response, $next){
+                $next();
+            },
+            'teste1',
+            'teste3'
+        ));
     }
 
     /**
