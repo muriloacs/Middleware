@@ -16,6 +16,7 @@ namespace MiddlewareTest\Listener;
 
 use Middleware\Listener\MiddlewareListener;
 use Zend\Mvc\MvcEvent;
+use Middleware\Service\MiddlewareRunnerService as Service;
 
 class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,9 +77,9 @@ class MiddlewareListenerTest extends \PHPUnit_Framework_TestCase
     private function givenMiddlewareConfig($global = array(), $local = array())
     {
         return array(
-            MiddlewareListener::CONFIG => array(
-                MiddlewareListener::CONFIG_GLOBAL => $global,
-                MiddlewareListener::CONFIG_LOCAL => $local,
+            Service::CONFIG => array(
+                Service::CONFIG_GLOBAL => $global,
+                Service::CONFIG_LOCAL => $local,
             ),
         );
     }

@@ -23,6 +23,8 @@ use Zend\ServiceManager\Config;
 
 class MiddlewareRunnerServiceFactory implements FactoryInterface
 {
+    public $middlewareServiceManager;
+
     /**
      * Creates the MiddlewareService's instance.
      *
@@ -68,7 +70,11 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
      */
     private function createMiddlewareServiceManager(array $config)
     {
-        $middlewareConfig = new Config($config[Service::CONFIG]);
-        return new ServiceManager($middlewareConfig);
+        if (!isset($this->middlewareServiceManager)) {
+            $middlewareConfig = new Config($config[Service::CONFIG]);
+            $this->middlewareServiceManager  = new ServiceManager($middlewareConfig);
+        }
+
+        return $this->middlewareServiceManager;
     }
 }
