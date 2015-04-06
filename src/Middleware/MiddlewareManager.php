@@ -43,10 +43,10 @@ class MiddlewareManager extends AbstractPluginManager
      * After invoking parent constructor, add an initializer to inject the
      * service manager and event manager
      *
-     * @param  null|ConfigInterface $configuration
+     * @param ConfigInterface $configuration
      * @param ServiceLocatorInterface $serviceManager
      */
-    public function __construct(ConfigInterface $configuration = null, ServiceLocatorInterface $serviceManager)
+    public function __construct(ConfigInterface $configuration, ServiceLocatorInterface $serviceManager)
     {
         parent::__construct($configuration);
 
@@ -64,12 +64,8 @@ class MiddlewareManager extends AbstractPluginManager
      * @param  ServiceLocatorInterface $serviceLocator
      * @return void
      */
-    public function injectMiddlewareDependencies($middleware, ServiceLocatorInterface $serviceLocator)
+    public function injectMiddlewareDependencies(MiddlewareInterface $middleware, ServiceLocatorInterface $serviceLocator)
     {
-        if (!$middleware instanceof MiddlewareInterface) {
-            return;
-        }
-
         $parentLocator = $serviceLocator->getServiceLocator();
 
         if ($middleware instanceof ServiceLocatorAwareInterface) {
@@ -77,11 +73,6 @@ class MiddlewareManager extends AbstractPluginManager
         }
 
         if ($middleware instanceof EventManagerAwareInterface) {
-            // If we have an event manager composed already, make sure it gets
-            // injected with the shared event manager.
-            // The AbstractController lazy-instantiates an EM instance, which
-            // is why the shared EM injection needs to happen; the conditional
-            // will always pass.
             $events = $middleware->getEventManager();
             if (!$events instanceof EventManagerInterface) {
                 $middleware->setEventManager($parentLocator->get('EventManager'));

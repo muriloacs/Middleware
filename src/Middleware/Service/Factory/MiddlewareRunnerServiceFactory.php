@@ -57,7 +57,7 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
     }
 
     /**
-     * Creates a custom ServiceManager.
+     * Returns Middleware Manager.
      *
      * @param array $config
      * @param ServiceLocatorInterface $serviceManager
