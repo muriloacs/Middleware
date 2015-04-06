@@ -14,16 +14,15 @@
 
 namespace Middleware\Service\Factory;
 
-use Middleware\Service\MiddlewareRunnerService as Service;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
+use Middleware\Service\MiddlewareRunnerService as Service;
+use Middleware\MiddlewareManager;
 
 class MiddlewareRunnerServiceFactory implements FactoryInterface
 {
-    public $middlewareServiceManager;
+    private $middlewareManager;
 
     /**
      * Creates the MiddlewareService's instance.
@@ -50,14 +49,10 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
     private function createMiddlewareFactory(ServiceLocatorInterface $serviceManager)
     {
         $config = $serviceManager->get('Config');   
-        $middlewareServiceManager = $this->createMiddlewareServiceManager($config);
+        $middlewareManager = $this->getMiddlewareManager($config, $serviceManager);
 
-        return function ($middlewareName) use ($serviceManager, $middlewareServiceManager) {
-            $middleware = $middlewareServiceManager->get($middlewareName);
-            if ($middleware instanceof ServiceLocatorAwareInterface) {
-                $middleware->setServiceLocator($serviceManager);
-            }
-            return $middleware;
+        return function ($middlewareName) use ($middlewareManager) {
+            return $middlewareManager->get($middlewareName);
         };
     }
 
@@ -65,16 +60,17 @@ class MiddlewareRunnerServiceFactory implements FactoryInterface
      * Creates a custom ServiceManager.
      *
      * @param array $config
-     * 
-     * @return ServiceManager
+     * @param ServiceLocatorInterface $serviceManager
+     *
+     * @return MiddlewareManager
      */
-    private function createMiddlewareServiceManager(array $config)
+    private function getMiddlewareManager(array $config, ServiceLocatorInterface $serviceManager)
     {
-        if (!isset($this->middlewareServiceManager)) {
+        if (!isset($this->middlewareManager)) {
             $middlewareConfig = new Config($config[Service::CONFIG]);
-            $this->middlewareServiceManager  = new ServiceManager($middlewareConfig);
+            $this->middlewareManager = new MiddlewareManager($middlewareConfig, $serviceManager);
         }
 
-        return $this->middlewareServiceManager;
+        return $this->middlewareManager;
     }
 }
