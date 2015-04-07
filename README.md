@@ -52,40 +52,36 @@ module/Application/config/module.config.php
 // ...
 'middlewares' => array(
     'global' => array(
-        'my.first.middleware',
-        'my.second.middleware'
+        'my.first.middleware'
     ),
     'local' => array(
         'Application\Controller\IndexController' => array(
-            'my.third.middleware'        
-        ),
+            'my.second.middleware'  
+        )
     ),
-    // ...
     'invokables' => array(
-        // ...
         'my.first.middleware' => 'Application\Middleware\First',
         'my.second.middleware' => 'Application\Middleware\Second',
-        // ...
-    ),
-    // ...
-    'services' => array(
-        // ...
-        'my.third.middleware' => function($request, $response, $next) {
-            // My code here. For instance:
-            var_dump($request->getHeader('user-agent'));
-            $next();
-        },
-        // ...
-    ),
-    // ...
+    )
 ),
 // ...
 ```
 
+#### Global scope
+Middlewares on global scope will be run everytime a request is made.
+
+#### Local scope
+Middlewares on local scope will be run only if the executed controller declares a middleware.
+
+#### This case
+In this case, `my.first.middleware` will be always executed no matter what route is being called. Whereas `my.second.middleware` will be executed only when
+Application\Controller\IndexController is being called. Thus, if we access Application\Controller\IndexController first and second middlewares will be executed.
+P.S: global middlewares are run before local middlewares.
+
 Usage
 -----
 
-Define your middleware classes:
+Once you have configured your middlewares, just define their classes:
 
 ```bash
 module/Application/src/Application/Middleware/First.php
@@ -108,6 +104,8 @@ class First
     }
 }
 ```
+
+
 ```bash
 module/Application/src/Application/Middleware/Second.php
 ```
@@ -129,18 +127,6 @@ class Second
     }
 }
 ```
-
-#### Global scope
-Middlewares on global scope will be executed everytime a request is made.
-
-#### Local scope
-Middlewares on local scope will be executed only if the current controller declares a middleware.
-
-P.S: local middlewares are executed after global middlewares.
-
-In this case, `my.first.middleware` and `my.second.middleware` will be always executed no matter what route is being called. Whereas `my.third.middleware` will be executed only when
-Application\Controller\IndexController is being called. Thus, if we access Application\Controller\IndexController first, second and third middlewares will be executed.
-
 
 Advanced usage
 --------------
@@ -178,6 +164,48 @@ class First implements ServiceLocatorAwareInterface
     public function getServiceLocator()
     {
         return $this->serviceLocator;
+    }
+}
+```
+
+#### Inject Event Manager
+
+It's also possible to access EventManager within your middleware classes. It's only necessary to implement EventManagerAwareInterface. For instance:
+
+```bash
+module/Application/src/Application/Middleware/First.php
+```
+```php
+
+namespace Application\Middleware;
+
+use Zend\EventManager\EventManager;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerInterface;
+
+class First implements EventManagerAwareInterface
+{
+    protected $eventManager;
+
+    public function __invoke($request, $response, $next)
+    {
+        // My code here. For instance:
+        $this->getEventManager()->trigger('myEvent', $this);
+        
+        $next();
+    }
+
+    public function getEventManager()
+    {
+        if (!$this->eventManager) { 
+             $this->setEventManager(new EventManager(__CLASS__)); 
+        }
+        return $this->eventManager;
+    }
+
+    public function setEventManager(EventManagerInterface $eventManager) 
+    {
+        $this->eventManager = $eventManager;
     }
 }
 ```
@@ -267,3 +295,9 @@ You can provide any callable as a middleware name. Such as functions, static met
 ),   
 // ...
 ``` 
+
+
+Practical usage
+---------------
+
+TODO...
