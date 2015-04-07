@@ -307,7 +307,7 @@ You can provide any callable as a middleware name. Such as functions, static met
 Practical usage
 ---------------
 
-TODO...
+#### Browser Layout
 
 ```php
 namespace Application\Middleware;
@@ -355,3 +355,71 @@ class First implements ServiceLocatorAwareInterface
     }
 }
 ``` 
+
+#### ACL
+
+```php
+namespace Application\Middleware;
+
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
+class Acl implements ServiceLocatorAwareInterface
+{
+    protected $serviceLocator;
+
+    public function __invoke($request, $response, $next)
+    {
+        $acl             = $this->getAcl();
+        $userRole        = $this->getCurrentUserRoleName();
+	    $currentResource = $this->getCurrentRouteName();
+
+	    if ($acl->isAllowed($userRole, $currentResource)) {
+		    $next();
+        }
+        else {
+            $response->setStatusCode(302);
+            $response->getHeaders()->addHeaderLine('Location', '/user/login')
+        }
+
+    }
+
+    /**
+     * @return \Zend\Permissions\Acl\Acl
+     */
+    public function getAcl()
+    {
+        $this->serviceLocator->get('MyAclService');
+    }
+
+    /**
+     * @ return string
+     */
+    public function getCurrentUserRoleName()
+    {
+        return $this->serviceLocator->get('MyCurrentUserRoleNameService');
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentRouteName()
+    {
+        return $this->serviceLocator
+        ->get('Application')
+		->getMvcEvent()
+		->getRouteMatch()
+		->getMatchedRouteName();
+    }
+
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+}
+```
