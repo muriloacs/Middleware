@@ -64,7 +64,7 @@ class MiddlewareManager extends AbstractPluginManager
      * @param  ServiceLocatorInterface $serviceLocator
      * @return void
      */
-    public function injectMiddlewareDependencies(MiddlewareInterface $middleware, ServiceLocatorInterface $serviceLocator)
+    public function injectMiddlewareDependencies($middleware, ServiceLocatorInterface $serviceLocator)
     {
         $parentLocator = $serviceLocator->getServiceLocator();
 
@@ -93,7 +93,7 @@ class MiddlewareManager extends AbstractPluginManager
      */
     public function validatePlugin($plugin)
     {
-        if ($plugin instanceof MiddlewareInterface || is_callable($plugin)) {
+        if (is_callable($plugin)) {
             // we're okay
             return;
         }
