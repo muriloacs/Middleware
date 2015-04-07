@@ -67,10 +67,10 @@ module/Application/config/module.config.php
 // ...
 ```
 
-#### Global scope
+#### Global
 Middlewares on global scope will be run everytime a request is made.
 
-#### Local scope
+#### Local
 Middlewares on local scope will be run only if the executed controller declares a middleware.
 
 #### This case
@@ -212,9 +212,9 @@ class First implements EventManagerAwareInterface
 
 #### Abstract Service Factory
 
-If you don't want to declare middlewares inside your service manager config key, you can use the abstract service factory provided by us.
+If you don't want to declare middlewares inside your config key, you can use the abstract service factory provided by us.
 
-1. Define your middleware class, you need to implement `Middleware\MiddlewareInterface`.
+1. Define your middleware class implementing `Middleware\MiddlewareInterface`.
     ```bash
     module/Application/src/Application/Middleware/First.php
     ```
@@ -236,7 +236,7 @@ If you don't want to declare middlewares inside your service manager config key,
     }
     ```
 
-2. Configure your middleware
+2. Configure your middleware using the fullname of the class.
     ```bash
     module/Application/config/module.config.php
     ```
@@ -246,25 +246,26 @@ If you don't want to declare middlewares inside your service manager config key,
     'middlewares' => array(
         'global' => array(
             'Application\Middleware\First'
-        )
+        ),
+        // ...
     ),
     // ...
     ```
 
-3. Configure the abstract service factory
+3. Configure the abstract factory.
     ```bash
     module/Application/config/module.config.php
     ```
     ```php
 
     // ...
-    'service_manager' => array(
-        // ...
-        'abstract_factories' => array(
-            // ...
-            'Middleware\Factory\MiddlewareAbstractServiceFactory'
+    'middlewares' => array(
+        'global' => array(
+            'Application\Middleware\First'
         ),
-        // ...
+        'abstract_factories' => array(
+            'Middleware\Factory\MiddlewareAbstractServiceFactory'
+        )
     ),
     // ...
     ```
@@ -278,9 +279,12 @@ You can provide any callable as a middleware name. Such as functions, static met
 'middlewares' => array(
     'global' => array(
         'my.first.middleware',
-        'my.second.middleware',
-        'MyNamespace\MyClass::MyStaticMethod', // Static method sample
-        function ($request, $response, $next) // Function sample
+
+        // Static method sample
+        'MyNamespace\MyClass::MyStaticMethod', 
+
+        // Function sample
+        function ($request, $response, $next) 
         {
             var_dump($request->getHeader('user-agent'));
             $next();    
@@ -288,10 +292,13 @@ You can provide any callable as a middleware name. Such as functions, static met
     ),
     'local' => array(
         'Application\Controller\IndexController' => array(
-            'my.third.middleware'        
+            'my.second.middleware'        
         ),
     ),
-    // ...
+    'invokables' => array(
+        'my.first.middleware' => 'Application\Middleware\First',
+        'my.second.middleware' => 'Application\Middleware\Second',
+    )
 ),   
 // ...
 ``` 
@@ -301,3 +308,50 @@ Practical usage
 ---------------
 
 TODO...
+
+```php
+namespace Application\Middleware;
+
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
+class First implements ServiceLocatorAwareInterface
+{
+    protected $serviceLocator;
+
+    public function __invoke($request, $response, $next)
+    {
+        $events = $this->serviceLocator->get('SharedEventManager');
+            
+        $events->attach('*', 'dispatch', function($e) use ($request) {
+            $controller = $e->getTarget();
+            $agent = $request->getHeader('user-agent')->toString();
+            
+            if (preg_match('/Firefox/', $agent)) {
+                $controller->layout('layout/firefox');
+                return;
+            }
+            if (preg_match('/Chrome/', $agent)) {
+                $controller->layout('layout/chrome');
+                return;
+            }
+            if (preg_match('/Safari/', $agent)) {
+                $controller->layout('layout/safari');
+                return;
+            }
+        }, 100);
+
+        $next();
+    }
+
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    public function getServiceLocator()
+    {
+        return $this->serviceLocator;
+    }
+}
+``` 
