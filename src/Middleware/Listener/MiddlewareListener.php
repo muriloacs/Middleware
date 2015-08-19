@@ -56,7 +56,7 @@ class MiddlewareListener extends AbstractListenerAggregate
         $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
 
         $global = $config[self::CONFIG][self::CONFIG_GLOBAL];
-        $local  = @$config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass] ?: array();
+        $local  = isset($config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass]) ? $config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass] : array();
         $middlewareNames = array_merge($global, $local);
 
         $service->run($middlewareNames);
