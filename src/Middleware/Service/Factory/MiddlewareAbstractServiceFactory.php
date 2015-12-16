@@ -32,7 +32,11 @@ class MiddlewareAbstractServiceFactory implements AbstractFactoryInterface
     {
         $interfaces = class_implements($requestedName);
 
-        return in_array('Middleware\MiddlewareInterface', $interfaces);
+        if (is_array($interfaces)) {
+            return isset($interfaces['Middleware\MiddlewareInterface']);
+        }
+
+        return false;
     }
 
     /**
