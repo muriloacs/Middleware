@@ -18,11 +18,6 @@ use Middleware\Service\MiddlewareRunnerService;
 
 class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var MiddlewareRunnerService
-     */
-    private $service;
-
     public function testInvokeShouldCallHandleMethodFromMiddleware()
     {
         $middleware      = $this->givenMiddlewareStub();
@@ -41,11 +36,13 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->givenService(function() use(&$factoryCallCount) {
             $factoryCallCount++;
-            return function(){};
+            return function() {};
         });
 
         $service->run(array());
+        $this->assertEquals(0, $factoryCallCount);
 
+        $service->run(array(null));
         $this->assertEquals(0, $factoryCallCount);
     }
 
@@ -54,15 +51,18 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
         $called = 0;
 
         $middlewareMock = $this->givenMiddlewareStub();
+        $test = $this;
 
-        $service = $this->givenService(function () use(&$called, $middlewareMock){
+        $service = $this->givenService(function () use($test, &$called, $middlewareMock){
 
             $called++;
 
             if ($called ==  1) {
-                return function ($request, $response, $next) use (&$called) {
+                return function ($request, $response, $next) use ($test, &$called) {
                     if ($called < 3) {
-                        $next();
+
+                        // Owerwrite request and response for next middlewares
+                        $next($test->givenDifferentRequestStub(), $test->givenDifferentResponseStub());
                     }
                 };
             }
@@ -74,11 +74,58 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 
         $service->run(array(
             function($request, $response, $next){
-                $next();
+                $next(
+                    $this->givenRequestStub(),
+                    $this->givenResponseStub()
+                );
             },
             'teste1',
-            'teste3'
+            function($request, $response, $next) use ($test) {
+
+                // In some of previous middlewares request and response must be overwritten
+                $test->assertInstanceOf('\Zend\Http\Request', $request);
+                $test->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Request', $request);
+                $test->assertInstanceOf('\Zend\Http\Response', $response);
+                $test->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
+                $next(
+                    $request,
+                    $response
+                );
+            },
+            'teste3',
         ));
+        $request = $service->getRequest();
+        $response = $service->getResponse();
+        $this->assertInstanceOf('\Zend\Http\Request', $request);
+        $this->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Request', $request);
+        $this->assertInstanceOf('\Zend\Http\Response', $response);
+        $this->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
+    }
+
+    public function testMiddlewareCanReturnValue()
+    {
+        $service = $this->givenService(function() {
+            return function() {
+            };
+        });
+        $response = $service->run(array(
+            function($request, $response, $next) {
+                return $next(
+                    $this->givenRequestStub(),
+                    $this->givenResponseStub()
+                );
+            },
+            function($request, $response, $next) {
+                return $next();
+            },
+            function($request, $response, $next) {
+                $next();
+                $response->setContent('OK');
+                return $response; // You
+            },
+            'testMiddleware'
+        ));
+        $this->assertInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
     }
 
     /**
@@ -106,11 +153,31 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return \Zend\Http\Request|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenDifferentRequestStub()
+    {
+        $request = $this->getStub('Zend\Http\Request');
+
+        return $request;
+    }
+
+    /**
      * @return \Zend\Http\PhpEnvironment\Response|\PHPUnit_Framework_MockObject_MockObject
      */
     private function givenResponseStub()
     {
         $request = $this->getStub('Zend\Http\PhpEnvironment\Response');
+
+        return $request;
+    }
+
+    /**
+     * @return \Zend\Http\Response|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenDifferentResponseStub()
+    {
+        $request = $this->getStub('Zend\Http\Response');
 
         return $request;
     }

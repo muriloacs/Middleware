@@ -14,42 +14,48 @@
 
 namespace Middleware\Service;
 
-use Closure;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Http\Response;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Stdlib\RequestInterface;
+use Zend\Stdlib\ResponseInterface;
 
 class MiddlewareRunnerService
 {
     /**
-     * @var Request
+     * @var RequestInterface
      */
     protected $request;
 
     /**
-     * @var Response
+     * @var ResponseInterface
      */
     protected $response;
 
     /**
-     * @var Closure
+     * @var callable
      */
     protected $factory;
 
     /**
-     * @param Request  $request
-     * @param Response $response
-     * @param Closure  $middlewareFactory
+     * @var array
      */
-    public function __construct(Request $request, Response $response, Closure $middlewareFactory)
+    protected $middlewareNames;
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $middlewareFactory
+     * @param ServiceLocatorInterface $serviceManager
+     */
+    public function __construct(RequestInterface $request, ResponseInterface $response, callable $middlewareFactory)
     {
-        $this->request  = $request;
+        $this->request = $request;
         $this->response = $response;
-        $this->factory  = $middlewareFactory;
+        $this->factory = $middlewareFactory;
     }
 
     /**
      * Runs the middleware list.
-     * 
+     *
      * @param array $middlewareNames
      */
     public function run(array $middlewareNames)
@@ -57,31 +63,79 @@ class MiddlewareRunnerService
         if (!$middlewareNames) {
             return;
         }
+        $this->middlewareNames = $middlewareNames;
+        $next = $this->getNextCallable();
+        return $next();
+    }
 
-        $middlewareName = array_shift($middlewareNames);
+    /**
+     * Return the current Request object (useful after all middlewares was executed)
+     * @return RequestInterface
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * Return the current Response object (useful after all middlewares was executed)
+     * @return ResponseInterface
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getNext()
+    {
+        $middlewareName = array_shift($this->middlewareNames);
+        if (!$middlewareName) {
+
+            return;
+        }
 
         if (is_callable($middlewareName)) {
             $middleware = $middlewareName;
-        }
-        else {
+        } else {
             $middleware = call_user_func($this->factory, $middlewareName);
         }
 
-        call_user_func($middleware, $this->request, $this->response, $this->getNext($middlewareNames));
+        return $middleware;
     }
 
     /**
      * Calls the next middleware.
      *
-     * @param array $middlewareNames
-     *
-     * @return Closure
+     * @return callable
      */
-    protected function getNext($middlewareNames)
+    protected function getNextCallable()
     {
         $service = $this;
-        return function () use ($service, $middlewareNames) {
-            $service->run($middlewareNames);
+
+        return function (
+            RequestInterface $request = null,
+            ResponseInterface $response = null,
+            callable $next = null
+        ) use ($service) {
+            $middleware = $service->getNext();
+            if (!$middleware) {
+
+                return;
+            }
+
+            // Allow Middleware to overwrite request and response
+            if (null !== $request) {
+                $service->request = $request;
+            }
+            if (null !== $response) {
+                $service->response = $response;
+            }
+
+            // Middleware can return values for other middlewares and own Response for dispatcher
+            return call_user_func($middleware, $service->request, $service->response, $service->getNextCallable());
         };
     }
 }

@@ -9,6 +9,8 @@ between route and controller dispatch phases.
 Installation
 ------------
 
+PHP 5.4 or higher is required.
+
 #### With composer
 
 Add this project in your `composer.json`:
@@ -74,11 +76,11 @@ module/Application/config/module.config.php
     // ...
     'services' => array(
         // ...
-        'my.third.middleware' => function($request, $response, $next) {
+        'my.third.middleware' => function($request, $response, $next = null) {
             // My code here. For instance:
 
             var_dump($request->getHeader('user-agent'));
-            $next();
+            return $next($request, $response);
         },
         // ...
     ),
@@ -101,15 +103,16 @@ namespace Application\Middleware;
 
 class First
 {
-    public function __invoke($request, $response, $next)
+    public function __invoke($request, $response, $next = null)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
 
-        $next(); // call the next middleware
+        $result = $next($request, $response); // call the next middleware
 
         // Run code after all middlewares run
+        return $result; // Return anything
     }
 }
 ```
@@ -122,16 +125,28 @@ namespace Application\Middleware;
 
 class Second
 {
-    public function __invoke($request, $response, $next)
+    public function __invoke($request, $response, $next = null)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
         
-        $next(); // call the next middleware
+        $next($request, $response); // call the next middleware
 
         // Run code after all middlewares run
     }
+}
+```
+
+#### Return responses
+
+If your first middleware will return object that implements Zend\Stdlib\ResponseInterface, Controller will be never called.
+Of course, your previous Middlewares (if they exists) should return $next($request, $response);
+
+```php
+function __invoke($request, $response, $next = null)
+{
+    return $response; // Do not call anything more and return this Response to the client
 }
 ```
 
@@ -197,15 +212,14 @@ If you don't want to declare middlewares inside your service manager config key,
     ```php
 
     namespace Application\Middleware;
-    
-    use Closure;
-    use Zend\Http\PhpEnvironment\Request;
-    use Zend\Http\PhpEnvironment\Response;
+
+    use Zend\Stdlib\RequestInterface;
+    use Zend\Stdlib\ResponseInterface;
     use Middleware\MiddlewareInterface;
     
     class First implements MiddlewareInterface
     {
-        public function __invoke(Request $request, Response $response, Closure $next)
+        public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next = null)
         {
             // My code here.
         }
@@ -256,10 +270,10 @@ You can provide any callable as a middleware name. Such as functions, static met
         'my.first.middleware',
         'my.second.middleware',
         'MyNamespace\MyClass::MyStaticMethod', // Static method sample
-        function ($request, $response, $next) // Function sample
+        function ($request, $response, $next = null) // Function sample
         {
             var_dump($request->getHeader('user-agent'));
-            $next();    
+            return $next($request, $response);
         }
     ),
     'local' => array(
@@ -268,4 +282,23 @@ You can provide any callable as a middleware name. Such as functions, static met
         ),
     ),
 ),   
+```
+
+#### Overwrite Request, Response or callable
+
+You can change $request, $response or $next for your next Middlewares.
+*Note: despite this your Controller will get only original request and response objects.*
+
+For example, here is the Response object is replaced:
+```php
+use Zend\Stdlib\ResponseInterface;
+class MyOwnResponse implements ResponseInterface
+{
+    // ...
+}
+function __invoke($request, $response, $next = null)
+{
+    $newResponse = new MyOwnResponse();
+    return $next($request, $newResponse, $next);
+}
 ```
