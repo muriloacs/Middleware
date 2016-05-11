@@ -81,10 +81,10 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
             function($request, $response, $next) use ($test) {
 
                 // In some of previous middlewares request and response must be overwritten
-                $test->assertInstanceOf(\Zend\Http\Request::class, $request);
-                $test->assertNotInstanceOf(\Zend\Http\PhpEnvironment\Request::class, $request);
-                $test->assertInstanceOf(\Zend\Http\Response::class, $response);
-                $test->assertNotInstanceOf(\Zend\Http\PhpEnvironment\Response::class, $response);
+                $test->assertInstanceOf('\Zend\Http\Request', $request);
+                $test->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Request', $request);
+                $test->assertInstanceOf('\Zend\Http\Response', $response);
+                $test->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
                 $next(
                     $request,
                     $response
@@ -94,10 +94,10 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
         ));
         $request = $service->getRequest();
         $response = $service->getResponse();
-        $this->assertInstanceOf(\Zend\Http\Request::class, $request);
-        $this->assertNotInstanceOf(\Zend\Http\PhpEnvironment\Request::class, $request);
-        $this->assertInstanceOf(\Zend\Http\Response::class, $response);
-        $this->assertNotInstanceOf(\Zend\Http\PhpEnvironment\Response::class, $response);
+        $this->assertInstanceOf('\Zend\Http\Request', $request);
+        $this->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Request', $request);
+        $this->assertInstanceOf('\Zend\Http\Response', $response);
+        $this->assertNotInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
     }
 
     public function testMiddlewareCanReturnValue()
@@ -123,7 +123,7 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
             },
             'testMiddleware'
         ));
-        $this->assertInstanceOf(\Zend\Http\PhpEnvironment\Response::class, $response);
+        $this->assertInstanceOf('\Zend\Http\PhpEnvironment\Response', $response);
     }
 
     /**

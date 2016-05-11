@@ -9,6 +9,8 @@ between route and controller dispatch phases.
 Installation
 ------------
 
+PHP 5.4 or higher is required.
+
 #### With composer
 
 Add this project in your `composer.json`:
