@@ -14,33 +14,32 @@
 
 namespace Middleware\Service;
 
-use Closure;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Http\Response;
+use Zend\Stdlib\RequestInterface;
+use Zend\Stdlib\ResponseInterface;
 
 class MiddlewareRunnerService
 {
     /**
-     * @var Request
+     * @var RequestInterface
      */
     protected $request;
 
     /**
-     * @var Response
+     * @var ResponseInterface
      */
     protected $response;
 
     /**
-     * @var Closure
+     * @var callable
      */
     protected $factory;
 
     /**
-     * @param Request  $request
-     * @param Response $response
-     * @param Closure  $middlewareFactory
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $middlewareFactory
      */
-    public function __construct(Request $request, Response $response, Closure $middlewareFactory)
+    public function __construct(RequestInterface $request, ResponseInterface $response, callable $middlewareFactory)
     {
         $this->request  = $request;
         $this->response = $response;
