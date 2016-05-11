@@ -92,6 +92,10 @@ class MiddlewareRunnerService
     protected function getNext()
     {
         $middlewareName = array_shift($this->middlewareNames);
+        if (!$middlewareName) {
+
+            return;
+        }
 
         if (is_callable($middlewareName)) {
             $middleware = $middlewareName;
@@ -117,6 +121,10 @@ class MiddlewareRunnerService
             callable $next = null
         ) use ($service) {
             $middleware = $service->getNext();
+            if (!$middleware) {
+
+                return;
+            }
 
             // Allow Middleware to overwrite request and response
             if (null !== $request) {

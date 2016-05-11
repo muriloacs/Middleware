@@ -36,11 +36,13 @@ class MiddlewareRunnerServiceTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->givenService(function() use(&$factoryCallCount) {
             $factoryCallCount++;
-            return function(){};
+            return function() {};
         });
 
         $service->run(array());
+        $this->assertEquals(0, $factoryCallCount);
 
+        $service->run(array(null));
         $this->assertEquals(0, $factoryCallCount);
     }
 
