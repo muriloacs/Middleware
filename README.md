@@ -76,11 +76,11 @@ module/Application/config/module.config.php
     // ...
     'services' => array(
         // ...
-        'my.third.middleware' => function($request, $response, $next) {
+        'my.third.middleware' => function($request, $response, $next = null) {
             // My code here. For instance:
 
             var_dump($request->getHeader('user-agent'));
-            return $next();
+            return $next($request, $response);
         },
         // ...
     ),
@@ -103,13 +103,13 @@ namespace Application\Middleware;
 
 class First
 {
-    public function __invoke($request, $response, $next)
+    public function __invoke($request, $response, $next = null)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
 
-        $result = $next(); // call the next middleware
+        $result = $next($request, $response); // call the next middleware
 
         // Run code after all middlewares run
         return $result; // Return anything
@@ -125,13 +125,13 @@ namespace Application\Middleware;
 
 class Second
 {
-    public function __invoke($request, $response, $next)
+    public function __invoke($request, $response, $next = null)
     {
         // My code here. For instance:
 
         var_dump($request->getHeader('user-agent'));
         
-        $next(); // call the next middleware
+        $next($request, $response); // call the next middleware
 
         // Run code after all middlewares run
     }
@@ -141,10 +141,10 @@ class Second
 #### Return responses
 
 If your first middleware will return object that implements Zend\Stdlib\ResponseInterface, Controller will be never called.
-Of course, your previous Middlewares (if they exists) should return $next();
+Of course, your previous Middlewares (if they exists) should return $next($request, $response);
 
 ```php
-function __invoke($request, $response, $next)
+function __invoke($request, $response, $next = null)
 {
     return $response; // Do not call anything more and return this Response to the client
 }
@@ -219,7 +219,7 @@ If you don't want to declare middlewares inside your service manager config key,
     
     class First implements MiddlewareInterface
     {
-        public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next)
+        public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next = null)
         {
             // My code here.
         }
@@ -270,10 +270,10 @@ You can provide any callable as a middleware name. Such as functions, static met
         'my.first.middleware',
         'my.second.middleware',
         'MyNamespace\MyClass::MyStaticMethod', // Static method sample
-        function ($request, $response, $next) // Function sample
+        function ($request, $response, $next = null) // Function sample
         {
             var_dump($request->getHeader('user-agent'));
-            return $next();
+            return $next($request, $response);
         }
     ),
     'local' => array(
@@ -296,7 +296,7 @@ class MyOwnResponse implements ResponseInterface
 {
     // ...
 }
-function __invoke($request, $response, $next)
+function __invoke($request, $response, $next = null)
 {
     $newResponse = new MyOwnResponse();
     return $next($request, $newResponse, $next);
