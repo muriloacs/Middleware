@@ -19,5 +19,5 @@ use Zend\Stdlib\ResponseInterface;
 
 interface MiddlewareInterface
 {
-    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next);
+    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next = null);
 }

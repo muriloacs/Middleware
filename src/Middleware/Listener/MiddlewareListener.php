@@ -47,10 +47,12 @@ class MiddlewareListener extends AbstractListenerAggregate
      * On dispatch handles local and global middlewares.
      *
      * @param MvcEvent $event
+     * @return \Zend\Stdlib\ResponseInterface|mixed
      */
     public function onDispatch(MvcEvent $event)
     {
         $sm = $event->getApplication()->getServiceManager();
+        /** @var \Middleware\Service\MiddlewareRunnerService $service */
         $service = $sm->get('MiddlewareRunnerService');
         $config  = $sm->get('Config');
         $controllerClass = $event->getRouteMatch()->getParam('controller').'Controller';
@@ -59,6 +61,6 @@ class MiddlewareListener extends AbstractListenerAggregate
         $local  = isset($config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass]) ? $config[self::CONFIG][self::CONFIG_LOCAL][$controllerClass] : array();
         $middlewareNames = array_merge($global, $local);
 
-        $service->run($middlewareNames);
+        return $service->run($middlewareNames);
     }
 }
